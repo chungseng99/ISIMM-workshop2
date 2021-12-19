@@ -1,9 +1,11 @@
 package com.ftmk.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.security.Principal;
+import java.sql.Blob;
 import java.util.List;
 
 import javax.mail.internet.InternetAddress;
@@ -11,6 +13,7 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.support.PagedListHolder;
 import org.springframework.core.io.InputStreamSource;
@@ -30,6 +33,7 @@ import com.ftmk.dao.clerkDashboardDao;
 import com.ftmk.model.Announcement;
 import com.ftmk.model.ClassParticipant;
 import com.ftmk.model.Classroom;
+import com.ftmk.model.Fee;
 import com.ftmk.model.UserPersonalDetails;
 import com.ftmk.model.UserTableDisplay;
 
@@ -449,7 +453,7 @@ public class ClerkDashboardController {
 		
 	}
 
-	@RequestMapping(value="/deleteAnnouncement")
+	@RequestMapping(value="/deleteAnnouncement",method=RequestMethod.GET)
 	public ModelAndView deleteAnnouncement(@RequestParam Integer announcementId) {
 		
 		
@@ -573,7 +577,7 @@ public class ClerkDashboardController {
 
 				List = new PagedListHolder<Announcement>();
 				List.setSource(creatorSearchResult);
-				List.setPageSize(1);
+				List.setPageSize(5);
 				request.getSession().setAttribute("announcement", List);
 
 			} else if (page.equals("prev")) {
@@ -648,6 +652,453 @@ public class ClerkDashboardController {
 		return model;
 
 	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value={"/feePage","/feePage/{page}"},method=RequestMethod.GET)
+	public ModelAndView feePage(ModelAndView model,@PathVariable(required = false, name = "page") String page,
+			HttpServletRequest request, HttpServletResponse response) {
+		
+		PagedListHolder<Fee> list;
+		List<Fee> feeList;
+		if (page == null) {
 
+			list = new PagedListHolder<Fee>();
+			feeList = clerkDao.feeList();
+			list.setSource(feeList);
+			list.setPageSize(5);
+			request.getSession().setAttribute("fee", list);
+
+		} else if (page.equals("prev")) {
+
+			list = (PagedListHolder<Fee>) request.getSession().getAttribute("fee");
+			list.previousPage();
+
+		} else if (page.equals("next")) {
+
+			list = (PagedListHolder<Fee>) request.getSession().getAttribute("fee");
+			list.nextPage();
+
+		} else {
+
+			int pageNum = Integer.parseInt(page);
+			list = (PagedListHolder<Fee>) request.getSession().getAttribute("fee");
+			list.setPage(pageNum - 1);
+
+		}
+		model.setViewName("feePage");
+		return model;
+	}
+
+	@RequestMapping(value="/createFeeForm")
+	public String createFeeForm() {
+		
+		return "createFeeForm";
+	}
+	
+	
+	@RequestMapping(value="/createFee",method=RequestMethod.POST)
+	public ModelAndView createFee(ModelAndView model,Fee fee,Principal principal) {
+		
+		int userId=clerkDao.getUserIdByUsername(principal.getName());
+		clerkDao.createFee(fee,userId);
+		model.setViewName("redirect:/feePage");
+		return model;
+		
+	}
+	
+	@RequestMapping(value="/editFee",method=RequestMethod.GET)
+	public ModelAndView editFee(@RequestParam Integer feeId) {
+		
+		Fee fee = clerkDao.getFeeById(feeId);
+		ModelAndView model = new ModelAndView("editFeeForm");
+		model.addObject("fee",fee);
+		return model;
+		
+	}
+	
+	
+	@RequestMapping(value="/updateFee",method=RequestMethod.POST)
+	public ModelAndView updateFee(ModelAndView model, @ModelAttribute(name="fee")Fee fee,Principal principal) {
+		
+		int userId=clerkDao.getUserIdByUsername(principal.getName());
+		clerkDao.updateFee(fee, userId);
+		model.addObject("fee", fee);
+		model.setViewName("redirect:/feePage");
+		return model;
+		
+	}
+	
+	@RequestMapping(value="/deleteFee",method=RequestMethod.GET)
+	public ModelAndView deleteFee(@RequestParam Integer feeId) {
+		
+		
+		clerkDao.deleteFee(feeId);
+
+		return new ModelAndView("redirect:/feePage");
+		
+	}
+	
+	
+	@RequestMapping(value="/searchFee",method=RequestMethod.GET)
+	public String searchFee() {
+		
+		return "searchFee";
+		
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = {"/searchFeeTitle","/searchFeeTitle/{page}"}, method = RequestMethod.GET)
+	public ModelAndView searchFeeTitle(ModelAndView model, @RequestParam("searchFeeTitle") String search,
+			@PathVariable(required = false, name = "page") String page,
+			HttpServletRequest request, HttpServletResponse response) {
+
+		List<Fee> titleSearchResult = clerkDao.searchByFeeTitle(search);
+
+		if (titleSearchResult.isEmpty()|| search.isBlank()) {
+
+			model.addObject("Message", "No Result Found");
+			model.setViewName("noClassResultFound");
+
+		} else {
+
+			PagedListHolder<Fee> List;
+			if (page == null) {
+
+				List = new PagedListHolder<Fee>();
+				List.setSource(titleSearchResult);
+				List.setPageSize(5);
+				request.getSession().setAttribute("fee", List);
+
+			} else if (page.equals("prev")) {
+
+				List = (PagedListHolder<Fee>) request.getSession().getAttribute("fee");
+				List.previousPage();
+
+			} else if (page.equals("next")) {
+
+				List = (PagedListHolder<Fee>) request.getSession().getAttribute("fee");
+				List.nextPage();
+
+			} else {
+
+				int pageNum = Integer.parseInt(page);
+				List = (PagedListHolder<Fee>) request.getSession().getAttribute("fee");
+				List.setPage(pageNum - 1);
+
+			}
+			String encode=URLEncoder.encode(search);
+			model.addObject("search",encode);
+			model.setViewName("searchFeeTitleResult");
+		}
+		return model;
+
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = {"/searchFeeDate","/searchFeeDate/{page}"}, method = RequestMethod.GET)
+	public ModelAndView searchFeeDate(ModelAndView model, @RequestParam("searchFeeDate") String search,
+			@PathVariable(required = false, name = "page") String page,
+			HttpServletRequest request, HttpServletResponse response) {
+
+		List<Fee> dateSearchResult = clerkDao.searchByFeeDate(search);
+
+		if (dateSearchResult.isEmpty()|| search.isBlank()) {
+
+			model.addObject("Message", "No Result Found");
+			model.setViewName("noClassResultFound");
+
+		} else {
+
+			PagedListHolder<Fee> List;
+			if (page == null) {
+
+				List = new PagedListHolder<Fee>();
+				List.setSource(dateSearchResult);
+				List.setPageSize(5);
+				request.getSession().setAttribute("fee", List);
+
+			} else if (page.equals("prev")) {
+
+				List = (PagedListHolder<Fee>) request.getSession().getAttribute("fee");
+				List.previousPage();
+
+			} else if (page.equals("next")) {
+
+				List = (PagedListHolder<Fee>) request.getSession().getAttribute("fee");
+				List.nextPage();
+
+			} else {
+
+				int pageNum = Integer.parseInt(page);
+				List = (PagedListHolder<Fee>) request.getSession().getAttribute("fee");
+				List.setPage(pageNum - 1);
+
+			}
+			String encode=URLEncoder.encode(search);
+			model.addObject("search",encode);
+			model.setViewName("searchFeeDateResult");
+		}
+		return model;
+
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = {"/searchFeeCreator","/searchFeeCreator/{page}"}, method = RequestMethod.GET)
+	public ModelAndView searchFeeCreator(ModelAndView model, @RequestParam("searchFeeCreator") String search,
+			@PathVariable(required = false, name = "page") String page,
+			HttpServletRequest request, HttpServletResponse response) {
+
+		List<Fee> creatorSearchResult = clerkDao.searchByFeeCreator(search);
+
+		if (creatorSearchResult.isEmpty()|| search.isBlank()) {
+
+			model.addObject("Message", "No Result Found");
+			model.setViewName("noClassResultFound");
+
+		} else {
+
+			PagedListHolder<Fee> List;
+			if (page == null) {
+
+				List = new PagedListHolder<Fee>();
+				List.setSource(creatorSearchResult);
+				List.setPageSize(5);
+				request.getSession().setAttribute("fee", List);
+
+			} else if (page.equals("prev")) {
+
+				List = (PagedListHolder<Fee>) request.getSession().getAttribute("fee");
+				List.previousPage();
+
+			} else if (page.equals("next")) {
+
+				List = (PagedListHolder<Fee>) request.getSession().getAttribute("fee");
+				List.nextPage();
+
+			} else {
+
+				int pageNum = Integer.parseInt(page);
+				List = (PagedListHolder<Fee>) request.getSession().getAttribute("fee");
+				List.setPage(pageNum - 1);
+
+			}
+			String encode=URLEncoder.encode(search);
+			model.addObject("search",encode);
+			model.setViewName("searchFeeCreatorResult");
+		}
+		return model;
+
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value={"/studentPage","/studentPage/{page}"})
+	public ModelAndView studentPage(ModelAndView model,@PathVariable(required = false, name = "page") String page,
+			HttpServletRequest request, HttpServletResponse responser) {
+		
+		PagedListHolder<UserPersonalDetails> list;
+		List<UserPersonalDetails> studentList;
+		if (page == null) {
+
+			list = new PagedListHolder<UserPersonalDetails>();
+			studentList = clerkDao.StudentList();
+			list.setSource(studentList);
+			list.setPageSize(5);
+			request.getSession().setAttribute("student", list);
+
+		} else if (page.equals("prev")) {
+
+			list = (PagedListHolder<UserPersonalDetails>) request.getSession().getAttribute("student");
+			list.previousPage();
+
+		} else if (page.equals("next")) {
+
+			list = (PagedListHolder<UserPersonalDetails>) request.getSession().getAttribute("student");
+			list.nextPage();
+
+		} else {
+
+			int pageNum = Integer.parseInt(page);
+			list = (PagedListHolder<UserPersonalDetails>) request.getSession().getAttribute("student");
+			list.setPage(pageNum - 1);
+
+		}
+		model.setViewName("studentPage");
+		return model;
+		
+		
+	}
+	
+	@RequestMapping(value="/viewStudent",method=RequestMethod.GET)
+	public ModelAndView viewStudent(@RequestParam Integer userId) {
+		
+		UserPersonalDetails user = clerkDao.getStudentById(userId);
+		ModelAndView model = new ModelAndView("viewStudentForm");
+		model.addObject("student",user);
+		return model;
+		
+	}
+	
+	@RequestMapping(value = "/getStudentPhoto/{userId}")
+	public void getStudentPhoto(HttpServletResponse response, @PathVariable("userId") int userId) throws Exception {
+		response.setContentType("image/jpeg, image/jpg, image/png");
+
+		Blob photo = clerkDao.getPhotoById(userId);
+
+		byte[] bytes = photo.getBytes(1, (int) photo.length());
+		InputStream inputStream = new ByteArrayInputStream(bytes);
+		IOUtils.copy(inputStream, response.getOutputStream());
+	}
+	
+	@RequestMapping(value="/searchStudent",method=RequestMethod.GET)
+	public String searchStudent() {
+		
+		return "searchStudent";
+		
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = {"/searchStudentName","/searchStudentName/{page}"}, method = RequestMethod.GET)
+	public ModelAndView searchStudentName(ModelAndView model, @RequestParam("searchStudentName") String search,
+			@PathVariable(required = false, name = "page") String page,
+			HttpServletRequest request, HttpServletResponse response) {
+
+		List<UserPersonalDetails> nameSearchResult = clerkDao.searchStudentByName(search);
+
+		if (nameSearchResult.isEmpty()|| search.isBlank()) {
+
+			model.addObject("Message", "No Result Found");
+			model.setViewName("noClassResultFound");
+
+		} else {
+
+			PagedListHolder<UserPersonalDetails> List;
+			if (page == null) {
+
+				List = new PagedListHolder<UserPersonalDetails>();
+				List.setSource(nameSearchResult);
+				List.setPageSize(10);
+				request.getSession().setAttribute("student", List);
+
+			} else if (page.equals("prev")) {
+
+				List = (PagedListHolder<UserPersonalDetails>) request.getSession().getAttribute("student");
+				List.previousPage();
+
+			} else if (page.equals("next")) {
+
+				List = (PagedListHolder<UserPersonalDetails>) request.getSession().getAttribute("student");
+				List.nextPage();
+
+			} else {
+
+				int pageNum = Integer.parseInt(page);
+				List = (PagedListHolder<UserPersonalDetails>) request.getSession().getAttribute("student");
+				List.setPage(pageNum - 1);
+
+			}
+			String encode=URLEncoder.encode(search);
+			model.addObject("search",encode);
+			model.setViewName("searchStudentNameResult");
+		}
+		return model;
+
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = {"/searchStudentIC","/searchStudentIC/{page}"}, method = RequestMethod.GET)
+	public ModelAndView searchStudentIC(ModelAndView model, @RequestParam("searchStudentIC") String search,
+			@PathVariable(required = false, name = "page") String page,
+			HttpServletRequest request, HttpServletResponse response) {
+
+		List<UserPersonalDetails> icSearchResult = clerkDao.searchStudentByIC(search);
+
+		if (icSearchResult.isEmpty()|| search.isBlank()) {
+
+			model.addObject("Message", "No Result Found");
+			model.setViewName("noClassResultFound");
+
+		} else {
+
+			PagedListHolder<UserPersonalDetails> List;
+			if (page == null) {
+
+				List = new PagedListHolder<UserPersonalDetails>();
+				List.setSource(icSearchResult);
+				List.setPageSize(10);
+				request.getSession().setAttribute("student", List);
+
+			} else if (page.equals("prev")) {
+
+				List = (PagedListHolder<UserPersonalDetails>) request.getSession().getAttribute("student");
+				List.previousPage();
+
+			} else if (page.equals("next")) {
+
+				List = (PagedListHolder<UserPersonalDetails>) request.getSession().getAttribute("student");
+				List.nextPage();
+
+			} else {
+
+				int pageNum = Integer.parseInt(page);
+				List = (PagedListHolder<UserPersonalDetails>) request.getSession().getAttribute("student");
+				List.setPage(pageNum - 1);
+
+			}
+			String encode=URLEncoder.encode(search);
+			model.addObject("search",encode);
+			model.setViewName("searchStudentICResult");
+		}
+		return model;
+
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = {"/searchStudentEmail","/searchStudentEmail/{page}"}, method = RequestMethod.GET)
+	public ModelAndView searchStudentEmail(ModelAndView model, @RequestParam("searchStudentEmail") String search,
+			@PathVariable(required = false, name = "page") String page,
+			HttpServletRequest request, HttpServletResponse response) {
+
+		List<UserPersonalDetails> emailSearchResult = clerkDao.searchStudentByEmail(search);
+
+		if (emailSearchResult.isEmpty()|| search.isBlank()) {
+
+			model.addObject("Message", "No Result Found");
+			model.setViewName("noClassResultFound");
+
+		} else {
+
+			PagedListHolder<UserPersonalDetails> List;
+			if (page == null) {
+
+				List = new PagedListHolder<UserPersonalDetails>();
+				List.setSource(emailSearchResult);
+				List.setPageSize(10);
+				request.getSession().setAttribute("student", List);
+
+			} else if (page.equals("prev")) {
+
+				List = (PagedListHolder<UserPersonalDetails>) request.getSession().getAttribute("student");
+				List.previousPage();
+
+			} else if (page.equals("next")) {
+
+				List = (PagedListHolder<UserPersonalDetails>) request.getSession().getAttribute("student");
+				List.nextPage();
+
+			} else {
+
+				int pageNum = Integer.parseInt(page);
+				List = (PagedListHolder<UserPersonalDetails>) request.getSession().getAttribute("student");
+				List.setPage(pageNum - 1);
+
+			}
+			String encode=URLEncoder.encode(search);
+			model.addObject("search",encode);
+			model.setViewName("searchStudentEmailResult");
+		}
+		return model;
+
+	}
+	
 	
 }

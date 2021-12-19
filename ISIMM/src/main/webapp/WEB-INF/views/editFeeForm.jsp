@@ -1,12 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="ISO-8859-1" isELIgnored="false"%>
+	pageEncoding="ISO-8859-1"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>  
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Edit Classroom</title>
+<title>Edit Fee</title>
 
 <link rel="stylesheet"
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -38,6 +38,8 @@
 		<div class="top-menu">
 			<nav class="navbar">
 				<ul class="nav top-menu ml-auto">
+					<li class="nav-item mt-2 mr-2"><a class="logout"
+						href="redirectChangePassword">Change Password</a></li>
 					<li class="nav-item mt-2"><a class="logout"
 						data-toggle="modal" href="#logoutModal">Logout</a></li>
 				</ul>
@@ -51,7 +53,7 @@
 		<div id="sidebar" class="nav-collapse ">
 			<!-- sidebar menu start-->
 			<ul class="sidebar-menu" id="nav-accordion">
-				<li class="mt "><a
+				<li class="mt "><a 
 					href="${pageContext.request.contextPath}/clerkDashboard"> <i
 						class="fa fa-dashboard "></i> <span>Home</span>
 				</a></li>
@@ -75,9 +77,9 @@
 				</a>
 					<ul class="sub">
 						<li><a
-							href="${pageContext.request.contextPath}/announcementList">Announcement
+							href="${pageContext.request.contextPath}/announcementPage">Announcement
 								List</a></li>
-						<li class="active"><a
+						<li><a
 							href="${pageContext.request.contextPath}/createAnnouncementForm">Create
 								Announcement</a></li>
 						<li><a
@@ -85,7 +87,18 @@
 								Announcement</a></li>
 
 					</ul></li>
-					
+
+				<li class="sub-menu"><a href="javascript:;"> <i
+						class="fa fa-cogs"></i> <span>Fee</span>
+				</a>
+					<ul class="sub">
+						<li><a href="${pageContext.request.contextPath}/feePage">Fee
+								List</a></li>
+						<li><a
+							href="${pageContext.request.contextPath}/createFeeForm">Create Fee</a></li>
+							<li><a
+							href="${pageContext.request.contextPath}/searchFee">Search Fee</a></li>
+					</ul>
 					<li class="sub-menu"><a href="javascript:;"> <i
 						class="fa fa-cogs"></i> <span>Fee</span>
 				</a>
@@ -113,85 +126,57 @@
 								
 								
 								</ul>
-
 			</ul>
 		</div>
 	</aside>
-
 	<section id="main-content">
 		<section class="wrapper">
 			<div class="container pt-3 ">
 				<h3>
-					<i class="fa fa-angle-right"> &nbsp;Edit Classroom</i>
+					<i class="fa fa-angle-right"> &nbsp;Edit fee</i>
 				</h3>
 				<!-- BASIC FORM ELELEMNTS -->
 				<div class="row mt">
 					<div class="col-lg-12">
 						<div class="form-panel">
-							<form:form class="form-horizontal style-form needs-validation"
-								modelAttribute="classroom" action="updateClassroom"
-								method="post" novalidate="novalidate">
-								<form:hidden path="classroomId" />
+							<form:form class="form-horizontal style-form needs-validation" modelAttribute="fee"
+								action="updateFee" method="post" novalidate="novalidate">
+							<form:hidden path="feeId"/>
 								<div class="form-group">
-									<label class="col-sm-2 col-sm-2 control-label">Form</label>
+									<label class="col-sm-2 col-sm-2 control-label">Fee
+										title</label>
 									<div class="col-sm-10">
-										<form:select path="form" class="form-control"
-											required="required">
-											<form:option value="" selected="selected" disabled="disabled">Choose
-												here</form:option>
-											<form:option value="1">1</form:option>
-											<form:option value="2">2</form:option>
-											<form:option value="3">3</form:option>
-											<form:option value="4">4</form:option>
-											<form:option value="5">5</form:option>
-											<form:option value="6">6</form:option>
-										</form:select>
-										<div class="invalid-feedback">Please select an option.</div>
+										<form:input path="feeName" class="form-control"
+											placeholder="Enter fee title" required="required"/>
+										<div class="invalid-feedback">Please fill out this
+											field.</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 col-sm-2 control-label">Fee
+										title</label>
+									<div class="col-sm-10">
+										<form:textarea path="feeDescription" class="form-control" rows="3"
+											placeholder="Enter fee description" required="required"></form:textarea>
+										<div class="invalid-feedback">Please fill out this
+											field.</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 col-sm-2 control-label">Fee
+										amount</label>
+									<div class="col-sm-10">
+										<form:input path="feeAmount" class="form-control" pattern="[0-9]+.[0-9]{2}"
+											placeholder="Enter fee amount Eg.(100.00)" required="required" />
+										<div class="invalid-feedback">Please enter fee with
+											format Eg.(100.00).</div>
 									</div>
 								</div>
 
-								<div class="form-group">
-									<label class="col-sm-2 col-sm-2 control-label">Class
-										Name</label>
-									<div class="col-sm-10">
-										<form:input path="className" class="form-control"
-											placeholder="Enter class name Eg.1A2" required="required"
-											pattern="[1-6]+[A/S]+[1-9]" />
-										<div class="invalid-feedback">Please enter the class
-											name Eg.1A2.</div>
-										<h6 style="color: red">${message}</h6>
-									</div>
-								</div>
-								<div class="form-group">
-									<label class="col-sm-2 col-sm-2 control-label">Teacher</label>
-									<div class="col-sm-10">
-										<form:select path="teacherName" class="form-control"
-											required="required">
-											<form:option value="" disabled="disabled">Choose
-												here</form:option>
-											<c:forEach items="${teacherList}" var="teacher">
-												<form:option value="${teacher.name }">${teacher.userId}-${teacher.name}</form:option>
-											</c:forEach>
-										</form:select>
-										<div class="invalid-feedback">Please select an option.</div>
-									</div>
-								</div>
-								<div class="form-group">
-									<label class="col-sm-2 col-sm-2 control-label">Maximum
-										Participant</label>
-									<div class="col-sm-10">
-										<form:input type="number" path="maxParticipant"
-											class="form-control"
-											placeholder="Enter maximum participant between (15-30)"
-											required="required" min="15" max="30" />
-										<div class="invalid-feedback">Please enter the class
-											name Eg.1A2.</div>
-									</div>
-								</div>
 
 								<div class="text-center">
 									<input type="submit" class="btn btn-primary btn-lg"
-										name="submit" value="SUBMIT">
+										name="submit" value="SUBMIT"> 
 								</div>
 								<div class="text-center">
 									<input type="button" class="btn btn-danger mt-2" name="cancel"
@@ -205,7 +190,6 @@
 			</div>
 		</section>
 	</section>
-
 
 
 	<!-- The Modal -->
@@ -265,6 +249,7 @@
 					}, false);
 		})();
 	</script>
+
 
 </body>
 </html>

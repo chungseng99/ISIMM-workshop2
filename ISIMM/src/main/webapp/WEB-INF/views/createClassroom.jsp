@@ -85,6 +85,33 @@
 								Announcement</a></li>
 
 					</ul></li>
+					<li class="sub-menu"><a href="javascript:;"> <i
+						class="fa fa-cogs"></i> <span>Fee</span>
+				</a>
+					<ul class="sub">
+						<li><a
+							href="${pageContext.request.contextPath}/feePage">Fee
+								List</a></li>
+						<li><a
+							href="${pageContext.request.contextPath}/createFeeForm">Create Fee</a></li>
+							
+							<li><a
+							href="${pageContext.request.contextPath}/searchFee">Search Fee</a></li>
+							</ul>
+							
+							<li class="sub-menu"><a href="javascript:;"> <i
+						class="fa fa-cogs"></i> <span>Student</span>
+				</a>
+					<ul class="sub">
+						<li><a
+							href="${pageContext.request.contextPath}/studentPage">Student
+								List</a></li>
+								<li><a
+							href="${pageContext.request.contextPath}/searchStudent">Search
+								Student</a></li>
+								
+								
+								</ul>
 
 			</ul>
 		</div>

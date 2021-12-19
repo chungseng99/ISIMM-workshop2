@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Search Announcement</title>
+<title>Search Fee</title>
 
 <link rel="stylesheet"
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -80,7 +80,7 @@
 						<li ><a
 							href="${pageContext.request.contextPath}/createAnnouncementForm">Create
 								Announcement</a></li>
-						<li class="active"><a
+						<li ><a
 							href="${pageContext.request.contextPath}/searchAnnouncement">Search
 								Announcement</a></li>
 
@@ -95,7 +95,7 @@
 						<li><a
 							href="${pageContext.request.contextPath}/createFeeForm">Create Fee</a></li>
 							
-							<li><a
+							<li ><a
 							href="${pageContext.request.contextPath}/searchFee">Search Fee</a></li>
 							</ul>
 							
@@ -106,7 +106,7 @@
 						<li><a
 							href="${pageContext.request.contextPath}/studentPage">Student
 								List</a></li>
-								<li><a
+								<li class="active"><a
 							href="${pageContext.request.contextPath}/searchStudent">Search
 								Student</a></li>
 								
@@ -121,21 +121,21 @@
 		<section class="wrapper">
 			<div class="container pt-3 ">
 				<h3>
-					<i class="fa fa-angle-right"> &nbsp;Search Announcement</i>
+					<i class="fa fa-angle-right"> &nbsp;Search Student</i>
 				</h3>
 				<!-- BASIC FORM ELELEMNTS -->
 				<div class="row mt">
 					<div class="col-lg-12">
 						<div class="form-panel">
-							<form class="form-horizontal style-form" action="searchTitle"
+							<form class="form-horizontal style-form" action="searchStudentName"
 								method="get" >
 
 								<div class="form-group">
 									<label class="col-sm-2 col-sm-2 control-label">Search
 										By Title</label>
 									<div class="col-sm-10">
-										<input type="text" name="searchTitle" class="form-control"
-											placeholder="Search announcement with title" />
+										<input type="text" name="searchStudentName" class="form-control"
+											placeholder="Search student with name" />
 											
 									</div>
 									<br>
@@ -153,15 +153,15 @@
 				<div class="row mt">
 					<div class="col-lg-12">
 						<div class="form-panel">
-							<form class="form-horizontal style-form" action="searchCreator"
+							<form class="form-horizontal style-form" action="searchStudentIC"
 								method="get" >
 
 								<div class="form-group">
 									<label class="col-sm-2 col-sm-2 control-label">Search
-										By Creator Name</label>
+										By IC Number</label>
 									<div class="col-sm-10">
-										<input type="text" name="searchCreator" class="form-control"
-											placeholder="Search classrooom with creator name" />
+										<input type="text" name="searchStudentIC" class="form-control"
+											placeholder="Search student with IC number" />
 											
 									</div>
 									<br>
@@ -180,15 +180,15 @@
 				<div class="row mt">
 					<div class="col-lg-12">
 						<div class="form-panel">
-							<form class="form-horizontal style-form" action="searchDateCreated"
+							<form class="form-horizontal style-form" action="searchStudentEmail"
 								method="get" >
 
 								<div class="form-group">
 									<label class="col-sm-2 col-sm-2 control-label">Search
-										By Date Created</label>
+										By Email</label>
 									<div class="col-sm-10">
-										<input type="text" name="searchDateCreated" class="form-control"
-											placeholder="Enter date with format (yyyy-mm-dd or mm-dd or dd or yyyy-mm or mm)"/>
+										<input type="text" name="searchStudentEmail" class="form-control"
+											placeholder="Search student with email"/>
 											
 									</div>
 									<br>

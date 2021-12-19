@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>View Users</title>
+<title>Search Result</title>
 
 <link rel="stylesheet"
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -47,7 +47,7 @@
 				<li class="mt"><a href="${pageContext.request.contextPath}/createUser"> <i
 						class="fa fa-dashboard"></i> <span>Create User</span>
 				</a></li>
-				<li class="mt"><a class="active" href="${pageContext.request.contextPath}/viewAll"> <i
+				<li class="mt"><a href="${pageContext.request.contextPath}/viewAll"> <i
 						class="fa fa-dashboard"></i> <span>View Users</span>
 				</a></li>
 				<li class="mt"><a href="${pageContext.request.contextPath}/searchUser"> <i
@@ -61,47 +61,48 @@
 
 	<section id="main-content">
 		<section class="wrapper site-min-height">
-		
+
 			<div class="row mt">
 				<div class="col-lg-12">
-				
-					<a href="${pageContext.request.contextPath}/createUser"><button class="btn btn-primary">Create
-							new User</button></a> &nbsp;<a href="${pageContext.request.contextPath}/searchUser"><button
-							class="btn btn-primary">Search Users</button></a><br> <br>
-		<div align="center">
-			<h1>User List</h1>
+					<a href="createUser"><button class="btn btn-primary">Create
+							new User</button></a>&nbsp;<a href="searchUser"><button
+							class="btn btn-primary">Search Users</button></a><br>
+					<br>
+
+					<div align="center">
+						<h1>User List</h1>
 <c:set value="${userList}" var="userPageList" />
-			<table class="table table-hover table-bordered">
-				<thead class="thead-dark">
-					<tr>
-						<th>No</th>
-						<th>Username</th>
-						<th>Name</th>
-						<th>IC Number</th>
-						<th>Role</th>
-						<th>Permission</th>
-						<th>Action</th>
-					</tr>
-				</thead>
+						<table class="table table-hover table-bordered">
+							<thead class="thead-dark">
+								<tr>
+									<th>No</th>
+									<th>Username</th>
+									<th>Name</th>
+									<th>IC Number</th>
+									<th>Role</th>
+									<th>Permission</th>
+									<th>Action</th>
+								</tr>
+							</thead>
 
-				<c:forEach items="${userPageList.pageList}" var="user" varStatus="status">
-					<tr>
-						<td>${status.index + 1}</td>
-						<td>${user.username}</td>
-						<td>${user.name}</td>
-						<td>${user.icNumber}</td>
-						<td>${user.role}</td>
-						<td>${user.enabled}</td>
+							<c:forEach items="${userPageList.pageList}" var="user" varStatus="status">
+								<tr>
+									<td>${status.index + 1}</td>
+									<td>${user.username}</td>
+									<td>${user.name}</td>
+									<td>${user.icNumber}</td>
+									<td>${user.role}</td>
+									<td>${user.enabled}</td>
 
 
-						<td><a href="${pageContext.request.contextPath}/edit?userId=${user.userId }"><input
-								type="button" class="btn btn-primary" value="Edit"></a>
-							&nbsp;&nbsp;&nbsp;&nbsp; <a data-toggle="modal"
+									<td><a href="${pageContext.request.contextPath}/edit?userId=${user.userId}"><input
+											type="button" class="btn btn-primary" value="Edit"></a>
+										&nbsp;&nbsp;&nbsp;&nbsp; <a data-toggle="modal"
 										href="#deactivateModal${user.userId }"><input type="button"
 											class="btn btn-danger" value="Deactivate"></a></td>
 
-					</tr>
-					<!-- The Modal -->
+								</tr>
+								<!-- The Modal -->
 								<div class="modal fade" id="deactivateModal${user.userId }">
 									<div class="modal-dialog">
 										<div class="modal-content">
@@ -127,10 +128,9 @@
 										</div>
 									</div>
 								</div>
-					
-				</c:forEach>
-			</table>
-							<div class='d-flex'>
+							</c:forEach>
+						</table>
+						<div class='d-flex'>
 						<ul class="pagination mx-auto">
 						<c:choose>
   <%-- Show Prev as link if not on first page --%>
@@ -139,7 +139,7 @@
   </c:when>
   <c:otherwise>
     <c:url value="prev" var="url" />                  
-    <li><a class="page-link" href='<c:out value="${pageContext.request.contextPath}/viewAll/${url}" />'>Prev</a></li>
+    <li><a class="page-link" href='<c:out value="${pageContext.request.contextPath}/searchRole/${url}?searchRole=${search}&submit=Search" />'>Prev</a></li>
   </c:otherwise>
 </c:choose>
 <c:forEach begin="1" end="${userPageList.pageCount}" step="1"  varStatus="tagStatus">
@@ -150,7 +150,7 @@
     </c:when>
     <c:otherwise>
       <c:url value="${tagStatus.index}" var="url" />                  
-      <li><a class="page-link" href='<c:out value="${pageContext.request.contextPath}/viewAll/${url}" />'>${tagStatus.index}</a></li>
+      <li><a class="page-link" href='<c:out value="${pageContext.request.contextPath}/searchRole/${url}?searchRole=${search}&submit=Search" />'>${tagStatus.index}</a></li>
     </c:otherwise>
   </c:choose>
 </c:forEach>
@@ -161,13 +161,14 @@
   </c:when>
   <c:otherwise>
   <c:url value="next" var="url" />                  
-    <li><a class="page-link" href='<c:out value="${pageContext.request.contextPath}/viewAll/${url}" />'>Next</a></li>
+    <li><a class="page-link" href='<c:out value="${pageContext.request.contextPath}/searchRole/${url}?searchRole=${search}&submit=Search" />'>Next</a></li>
   </c:otherwise>
 </c:choose>
 </ul>
 </div>
-</div>
-			</div>
+					</div>
+
+				</div>
 			</div>
 		</section>
 	</section>

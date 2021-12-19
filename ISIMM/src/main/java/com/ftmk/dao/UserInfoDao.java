@@ -155,6 +155,29 @@ public class UserInfoDao {
 		return list;
 	}
 	
+	public List<UserTableDisplay> searchByRole(String search) {
+		//Select certain field from each table to be displayed in admin dashboard
+		String sql = "SELECT users.user_id, users.username,users.enabled,user_details.name,user_details.ic_number,"
+				+ "user_role.role FROM users JOIN user_details ON users.user_id=user_details.user_id "
+				+ "JOIN user_role ON users.user_id=user_role.user_id WHERE user_role.role LIKE '%"+search+"%'";
+		List<UserTableDisplay> list = jdbcTemplate.query(sql, new RowMapper<UserTableDisplay>() {
+
+			@Override
+			public UserTableDisplay mapRow(ResultSet rs, int rowNum) throws SQLException {
+					
+				UserTableDisplay display = new UserTableDisplay();
+				display.setUserId(rs.getInt("user_id"));
+				display.setUsername(rs.getString("username"));
+				display.setIcNumber(rs.getString("ic_number"));
+				display.setName(rs.getString("name"));
+				display.setRole(rs.getString("role"));
+				display.setEnabled(rs.getBoolean("enabled"));
+				return display;
+			}
+		});
+		return list;
+	}
+	
 	public String getUserRoles(String username) {
 
 		String sql = "SELECT role FROM user_role JOIN users ON user_role.user_id=users.user_id WHERE username=?";

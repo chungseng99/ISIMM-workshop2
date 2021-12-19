@@ -138,7 +138,32 @@
 											class="btn btn-primary btn-lg" name="submit">
 									</div>
 								</div>
+								
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="row mt">
+					<div class="col-lg-12">
+						<div class="form-panel">
+							<form class="form-horizontal style-form" action="searchRole"
+								method="get">
 
+								<div class="form-group">
+									<label class="col-sm-2 col-sm-2 control-label">Search
+										By Role</label>
+									<div class="col-sm-10">
+										<input type="text" name="searchRole" class="form-control"
+											placeholder="Search role" />
+
+									</div>
+									<br>
+									<div class="text-center">
+										<input type="submit" value="Search"
+											class="btn btn-primary btn-lg" name="submit">
+									</div>
+								</div>
+								
 							</form>
 						</div>
 					</div>

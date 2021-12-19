@@ -1,18 +1,27 @@
 package com.ftmk.dao;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Blob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.ftmk.model.Announcement;
 import com.ftmk.model.Classroom;
+import com.ftmk.model.Fee;
 import com.ftmk.model.UserPersonalDetails;
 import com.ftmk.model.UserTableDisplay;
 
@@ -29,7 +38,8 @@ public class clerkDashboardDao {
 	public List<UserPersonalDetails> teacherList() {
 		// Select certain field from each table to be displayed in admin dashboard
 		String sql = "SELECT user_details.user_id,user_details.name,user_details.ic_number FROM user_details JOIN user_role ON "
-				+ "user_details.user_id=user_role.user_id WHERE user_role.role='TEACHER'";
+				+ "user_details.user_id=user_role.user_id JOIN users ON user_details.user_id=users.user_id "
+				+ "WHERE user_role.role='TEACHER' AND users.enabled=1";
 		List<UserPersonalDetails> list = jdbcTemplate.query(sql, new RowMapper<UserPersonalDetails>() {
 
 			@Override
@@ -147,9 +157,10 @@ public class clerkDashboardDao {
 
 	public List<UserPersonalDetails> unassignedStudentList() {
 		// Select certain field from each table to be displayed in admin dashboard
-		String sql = "SELECT user_details.user_id,user_details.name,user_details.ic_number FROM user_details "
-				+ "JOIN user_role ON user_details.user_id=user_role.user_id"
-				+ " WHERE user_details.user_id NOT IN (SELECT class_participant.user_id FROM class_participant) AND user_role.role='STUDENT'";
+		String sql = "SELECT user_details.user_id,user_details.name,user_details.ic_number FROM user_details JOIN user_role ON "
+				+ "user_details.user_id=user_role.user_id JOIN users ON user_details.user_id=users.user_id  "
+				+ "WHERE user_details.user_id NOT IN (SELECT class_participant.user_id FROM class_participant) AND "
+				+ "user_role.role='STUDENT' AND users.enabled=1";
 
 		List<UserPersonalDetails> list = jdbcTemplate.query(sql, new RowMapper<UserPersonalDetails>() {
 
@@ -166,16 +177,166 @@ public class clerkDashboardDao {
 		return list;
 	}
 	
+	
+	public List<UserPersonalDetails> StudentList() {
+		// Select certain field from each table to be displayed in admin dashboard
+		String sql = "SELECT user_details.* FROM user_details JOIN user_role ON user_details.user_id=user_role.user_id JOIN "
+				+ "users ON user_details.user_id=users.user_id WHERE user_role.role='STUDENT' AND users.enabled=1";
+
+		List<UserPersonalDetails> list = jdbcTemplate.query(sql, new RowMapper<UserPersonalDetails>() {
+
+			@Override
+			public UserPersonalDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				UserPersonalDetails user = new UserPersonalDetails();
+				user.setUserId(rs.getInt("user_id"));
+				user.setName(rs.getString("name"));
+				user.setIcNumber(rs.getString("ic_number"));
+				user.setEmail(rs.getString("email"));
+				user.setPhoneNumber(rs.getString("phone_number"));
+				user.setAddress(rs.getString("address"));
+				user.setNationality(rs.getString("nationality"));
+				user.setEthnicity(rs.getString("ethnicity"));
+				user.setPicture(rs.getBlob("picture"));
+				return user;
+			}
+		});
+		return list;
+	}
+	
+	public UserPersonalDetails getStudentById(Integer userId) {
+		String sql = "SELECT * FROM user_details WHERE user_id=" + "'" + userId + "'";
+
+		return jdbcTemplate.query(sql, new ResultSetExtractor<UserPersonalDetails>() {
+
+			@Override
+			public UserPersonalDetails extractData(ResultSet rs) throws SQLException, DataAccessException {
+
+				if (rs.next()) {
+
+					UserPersonalDetails user = new UserPersonalDetails();
+					user.setUserId(rs.getInt("user_id"));
+					user.setName(rs.getString("name"));
+					user.setIcNumber(rs.getString("ic_number"));
+					user.setEmail(rs.getString("email"));
+					user.setPhoneNumber(rs.getString("phone_number"));
+					user.setAddress(rs.getString("address"));
+					user.setNationality(rs.getString("nationality"));
+					user.setEthnicity(rs.getString("ethnicity"));
+					user.setPicture(rs.getBlob("picture"));
+					return user;
+				}
+				return null;
+
+			}
+
+		});
+	}
+	
+	
+	public Blob getPhotoById(int userId) {
+
+		String query = "SELECT picture FROM user_details where user_id=?";
+
+		Blob photo = jdbcTemplate.queryForObject(query, new Object[] { userId }, Blob.class);
+
+		return photo;
+	}
+	
+	
+	public List<UserPersonalDetails> searchStudentByName(String search) {
+		// Select certain field from each table to be displayed in admin dashboard
+		String sql = "SELECT user_details.* FROM user_details JOIN user_role ON user_details.user_id=user_role.user_id JOIN "
+				+ "users ON user_details.user_id=users.user_id WHERE user_role.role='STUDENT' AND "
+				+ "users.enabled=1 AND user_details.name LIKE "+"'%"+search+"%'";
+
+		List<UserPersonalDetails> list = jdbcTemplate.query(sql, new RowMapper<UserPersonalDetails>() {
+
+			@Override
+			public UserPersonalDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				UserPersonalDetails user = new UserPersonalDetails();
+				user.setUserId(rs.getInt("user_id"));
+				user.setName(rs.getString("name"));
+				user.setIcNumber(rs.getString("ic_number"));
+				user.setEmail(rs.getString("email"));
+				user.setPhoneNumber(rs.getString("phone_number"));
+				user.setAddress(rs.getString("address"));
+				user.setNationality(rs.getString("nationality"));
+				user.setEthnicity(rs.getString("ethnicity"));
+				user.setPicture(rs.getBlob("picture"));
+				return user;
+			}
+		});
+		return list;
+	}
+	
+	public List<UserPersonalDetails> searchStudentByIC(String search) {
+		// Select certain field from each table to be displayed in admin dashboard
+		String sql = "SELECT user_details.* FROM user_details JOIN user_role ON user_details.user_id=user_role.user_id JOIN "
+				+ "users ON user_details.user_id=users.user_id WHERE user_role.role='STUDENT' AND "
+				+ "users.enabled=1 AND user_details.ic_number LIKE "+"'%"+search+"%'";
+
+		List<UserPersonalDetails> list = jdbcTemplate.query(sql, new RowMapper<UserPersonalDetails>() {
+
+			@Override
+			public UserPersonalDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				UserPersonalDetails user = new UserPersonalDetails();
+				user.setUserId(rs.getInt("user_id"));
+				user.setName(rs.getString("name"));
+				user.setIcNumber(rs.getString("ic_number"));
+				user.setEmail(rs.getString("email"));
+				user.setPhoneNumber(rs.getString("phone_number"));
+				user.setAddress(rs.getString("address"));
+				user.setNationality(rs.getString("nationality"));
+				user.setEthnicity(rs.getString("ethnicity"));
+				user.setPicture(rs.getBlob("picture"));
+				return user;
+			}
+		});
+		return list;
+	}
+	
+	public List<UserPersonalDetails> searchStudentByEmail(String search) {
+		// Select certain field from each table to be displayed in admin dashboard
+		String sql = "SELECT user_details.* FROM user_details JOIN user_role ON user_details.user_id=user_role.user_id JOIN "
+				+ "users ON user_details.user_id=users.user_id WHERE user_role.role='STUDENT' AND "
+				+ "users.enabled=1 AND user_details.email LIKE "+"'%"+search+"%'";
+
+		List<UserPersonalDetails> list = jdbcTemplate.query(sql, new RowMapper<UserPersonalDetails>() {
+
+			@Override
+			public UserPersonalDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				UserPersonalDetails user = new UserPersonalDetails();
+				user.setUserId(rs.getInt("user_id"));
+				user.setName(rs.getString("name"));
+				user.setIcNumber(rs.getString("ic_number"));
+				user.setEmail(rs.getString("email"));
+				user.setPhoneNumber(rs.getString("phone_number"));
+				user.setAddress(rs.getString("address"));
+				user.setNationality(rs.getString("nationality"));
+				user.setEthnicity(rs.getString("ethnicity"));
+				user.setPicture(rs.getBlob("picture"));
+				return user;
+			}
+		});
+		return list;
+	}
+	
 	public int countUnassignedStudent() {
 		
-		String sql="SELECT COUNT(user_details.user_id) FROM user_details JOIN user_role ON user_details.user_id=user_role.user_id "
-				+ "WHERE user_role.role='STUDENT' AND user_details.user_id NOT IN (SELECT user_id FROM class_participant)";
+		String sql="SELECT COUNT(user_details.user_id) FROM user_details JOIN user_role ON user_details.user_id=user_role.user_id JOIN "
+				+ "users ON user_details.user_id=users.user_id WHERE user_role.role='STUDENT' AND "
+				+ "user_details.user_id NOT IN (SELECT user_id FROM class_participant) AND users.enabled=1";
 		return jdbcTemplate.queryForObject(sql, Integer.class);
 	}
 	
 	public int totalStudent() {
 		
-		String sql="SELECT COUNT(role) FROM user_role WHERE user_role.role='STUDENT'";
+		String sql="SELECT COUNT(role) FROM user_role JOIN users ON user_role.user_id=users.user_id "
+				+ "WHERE user_role.role='STUDENT' AND users.enabled=1";
 		return jdbcTemplate.queryForObject(sql,Integer.class);
 	}
 	
@@ -469,6 +630,151 @@ public class clerkDashboardDao {
 				announcement.setUserId(rs.getInt("user_id"));
 				announcement.setName(rs.getString("name"));
 				return announcement;
+				
+			}
+		});
+		return list;
+	}
+	
+	public int createFee(Fee fee,Integer userId) {
+		
+		String sql="INSERT INTO fee (fee_name,fee_description,fee_amount,fee_date_created,user_id) VALUES (?,?,?,?,?)";
+		return jdbcTemplate.update(sql,fee.getFeeName(),fee.getFeeDescription(),fee.getFeeAmount(),fee.getDateCreated(),userId);
+		
+	}
+	
+	public List<Fee> feeList() {
+		// Select certain field from each table to be displayed in admin dashboard
+		String sql = "SELECT fee.*,user_details.name FROM fee JOIN user_details ON user_details.user_id=fee.user_id";
+		List<Fee> list = jdbcTemplate.query(sql, new RowMapper<Fee>() {
+
+			@Override
+			public Fee mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				Fee fee =new Fee();
+				fee.setFeeId(rs.getInt("fee_id"));
+				fee.setFeeName(rs.getString("fee_name"));
+				fee.setFeeDescription(rs.getString("fee_description"));
+				fee.setDateCreated(rs.getDate("fee_date_created"));
+				fee.setFeeAmount(rs.getDouble("fee_amount"));
+				fee.setUserId(rs.getInt("user_id"));
+				fee.setName(rs.getString("name"));
+				return fee;
+			}
+		});
+		return list;
+	}
+	
+	public Fee getFeeById(Integer feeId) {
+		// Select certain field from each table to be displayed in admin dashboard
+		String sql = "SELECT fee.*,user_details.name FROM fee JOIN user_details ON "
+				+ "fee.user_id=user_details.user_id WHERE fee_id=" + "'" + feeId + "'";
+
+		return jdbcTemplate.query(sql, new ResultSetExtractor<Fee>() {
+
+			@Override
+			public Fee extractData(ResultSet rs) throws SQLException, DataAccessException {
+
+				if (rs.next()) {
+
+					Fee fee = new Fee();
+					fee.setFeeId(rs.getInt("fee_id"));
+					fee.setFeeName(rs.getString("fee_name"));
+					fee.setFeeDescription(rs.getString("fee_description"));
+					fee.setDateCreated(rs.getDate("fee_date_created"));
+					fee.setFeeAmount(rs.getDouble("fee_amount"));
+					fee.setUserId(rs.getInt("user_id"));
+					fee.setName(rs.getString("name"));
+					return fee;
+					
+				}
+				return null;
+
+			}
+
+		});
+	}
+	
+	public int updateFee(Fee fee,Integer userId) {
+		
+		String sql="UPDATE fee SET fee_name=?, fee_description=?, fee_amount=?, fee_date_created=?, user_id=? WHERE fee_id=?";
+		return jdbcTemplate.update(sql,fee.getFeeName(),fee.getFeeDescription(),fee.getFeeAmount(),fee.getDateCreated(),userId,fee.getFeeId());
+		
+	}
+	
+	public int deleteFee(Integer feeId) {
+		
+		String sql = "DELETE FROM fee WHERE fee_id=?";
+		return jdbcTemplate.update(sql, feeId);
+
+}
+	
+	public List<Fee> searchByFeeTitle(String search) {
+		// Select certain field from each table to be displayed in admin dashboard
+		String sql = "SELECT fee.*,user_details.name FROM fee JOIN user_details ON"
+				+ " fee.user_id=user_details.user_id WHERE fee_name LIKE " + "'%" + search + "%'";
+		List<Fee> list = jdbcTemplate.query(sql, new RowMapper<Fee>() {
+
+			@Override
+			public Fee mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				Fee fee = new Fee();
+				fee.setFeeId(rs.getInt("fee_id"));
+				fee.setFeeName(rs.getString("fee_name"));
+				fee.setFeeDescription(rs.getString("fee_description"));
+				fee.setDateCreated(rs.getDate("fee_date_created"));
+				fee.setFeeAmount(rs.getDouble("fee_amount"));
+				fee.setUserId(rs.getInt("user_id"));
+				fee.setName(rs.getString("name"));
+				return fee;
+				
+			}
+		});
+		return list;
+	}
+	
+	public List<Fee> searchByFeeDate(String search) {
+		// Select certain field from each table to be displayed in admin dashboard
+		String sql = "SELECT fee.*,user_details.name FROM fee JOIN user_details ON"
+				+ " fee.user_id=user_details.user_id WHERE fee_date_created LIKE " + "'%" + search + "%'";
+		List<Fee> list = jdbcTemplate.query(sql, new RowMapper<Fee>() {
+
+			@Override
+			public Fee mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				Fee fee = new Fee();
+				fee.setFeeId(rs.getInt("fee_id"));
+				fee.setFeeName(rs.getString("fee_name"));
+				fee.setFeeDescription(rs.getString("fee_description"));
+				fee.setDateCreated(rs.getDate("fee_date_created"));
+				fee.setFeeAmount(rs.getDouble("fee_amount"));
+				fee.setUserId(rs.getInt("user_id"));
+				fee.setName(rs.getString("name"));
+				return fee;
+				
+			}
+		});
+		return list;
+	}
+	
+	public List<Fee> searchByFeeCreator(String search) {
+		// Select certain field from each table to be displayed in admin dashboard
+		String sql = "SELECT fee.*,user_details.name FROM fee JOIN user_details ON"
+				+ " fee.user_id=user_details.user_id WHERE user_details.name LIKE " + "'%" + search + "%'";
+		List<Fee> list = jdbcTemplate.query(sql, new RowMapper<Fee>() {
+
+			@Override
+			public Fee mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				Fee fee = new Fee();
+				fee.setFeeId(rs.getInt("fee_id"));
+				fee.setFeeName(rs.getString("fee_name"));
+				fee.setFeeDescription(rs.getString("fee_description"));
+				fee.setDateCreated(rs.getDate("fee_date_created"));
+				fee.setFeeAmount(rs.getDouble("fee_amount"));
+				fee.setUserId(rs.getInt("user_id"));
+				fee.setName(rs.getString("name"));
+				return fee;
 				
 			}
 		});

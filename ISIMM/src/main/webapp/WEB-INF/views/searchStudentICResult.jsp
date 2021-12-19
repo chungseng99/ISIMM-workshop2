@@ -59,7 +59,7 @@
 						class="fa fa-cogs"></i> <span>Classroom</span>
 				</a>
 					<ul class="sub">
-						<li ><a
+						<li><a
 							href="${pageContext.request.contextPath}/classroomPage">Classroom
 								List</a></li>
 						<li><a
@@ -74,7 +74,7 @@
 						class="fa fa-cogs"></i> <span>Announcement</span>
 				</a>
 					<ul class="sub">
-						<li ><a
+						<li><a
 							href="${pageContext.request.contextPath}/announcementPage">Announcement
 								List</a></li>
 						<li><a
@@ -85,34 +85,32 @@
 								Announcement</a></li>
 
 					</ul></li>
-					<li class="sub-menu"><a href="javascript:;"> <i
+				<li class="sub-menu"><a href="javascript:;"> <i
 						class="fa fa-cogs"></i> <span>Fee</span>
 				</a>
 					<ul class="sub">
-						<li><a
-							href="${pageContext.request.contextPath}/feePage">Fee
+						<li><a href="${pageContext.request.contextPath}/feePage">Fee
 								List</a></li>
 						<li><a
-							href="${pageContext.request.contextPath}/createFeeForm">Create Fee</a></li>
-							
-							<li><a
-							href="${pageContext.request.contextPath}/searchFee">Search Fee</a></li>
-							</ul>
-							
-							<li class="sub-menu"><a href="javascript:;"> <i
+							href="${pageContext.request.contextPath}/createFeeForm">Create
+								Fee</a></li>
+
+						<li><a href="${pageContext.request.contextPath}/searchFee">Search
+								Fee</a></li>
+					</ul>
+				<li class="sub-menu"><a href="javascript:;"> <i
 						class="fa fa-cogs"></i> <span>Student</span>
 				</a>
 					<ul class="sub">
-						<li><a
+						<li class="active"><a
 							href="${pageContext.request.contextPath}/studentPage">Student
 								List</a></li>
-								<li><a
+						<li><a
 							href="${pageContext.request.contextPath}/searchStudent">Search
 								Student</a></li>
-								
-								
-								</ul>
 
+
+					</ul>
 			</ul>
 		</div>
 	</aside>
@@ -121,133 +119,77 @@
 
 			<div class="row mt">
 				<div class="col-lg-12">
-
-					<a href="${pageContext.request.contextPath}/createAnnouncementForm"><button
-							class="btn btn-primary">Create Announcement</button></a> &nbsp;<a
-						href="${pageContext.request.contextPath}/searchAnnouncement"><button
-							class="btn btn-primary">Search Announcement</button></a><br> <br>
-
-					<h1>Announcement List</h1>
-					<c:set value="${announcement}" var="announcementList" />
+					<a href="${pageContext.request.contextPath}/searchStudent"><button
+							class="btn btn-primary">Search Student</button></a><br> <br>
+					<div align="center">
+					<h1>Search Result</h1></div>
+					<c:set value="${student}" var="studentList" />
 					<table class="table table-hover table-bordered">
 						<thead class="thead-dark">
 							<tr>
 								<th>No</th>
-								<th width="50%">Title</th>
-								<th>Date</th>
-								<th width="20%">Creator</th>
-								<th width="15%">Action</th>
+								<th>Name</th>
+								<th>IC Number </th>
+								<th>Email</th>
+								<th width=10%>Phone Number</th>
+								<th width="10%">Action</th>
 							</tr>
 						</thead>
 
-						<c:forEach items="${announcementList.pageList}" var="announcement" varStatus="status">
+						<c:forEach items="${studentList.pageList}" var="student"
+							varStatus="status">
 							<tr>
 								<td>${status.index + 1}</td>
-								<td>${announcement.title}</td>
-								<td>${announcement.dateCreated}</td>
-								<td>${announcement.name}</td>
-								
+								<td>${student.name}</td>
+								<td>${student.icNumber}</td>
+								<td>${student.email}</td>
+								<td>${student.phoneNumber}</td>
 
-								<td><a class="mr-3" href="${pageContext.request.contextPath}/editAnnouncement?announcementId=${announcement.announcementId }"><input
-										type="button" class="btn btn-primary" value="Edit/View"></a>
-										<div class="mt-2"><a data-toggle="modal" href="#sendModal${announcement.announcementId }"><input 
-										type="button" class="btn btn-primary" value="Send"></a></div>
-									<div class="mt-2"> <a data-toggle="modal"
-									href="#deleteModal${announcement.announcementId }"><input type="button"
-										class="btn btn-danger" value="Delete"></a></div></td>
 
+
+
+								<td><a class="mr-3"
+									href="${pageContext.request.contextPath}/viewStudent?userId=${student.userId }"><input
+										type="button" class="btn btn-primary" value="View"></a>
 							</tr>
-							<!-- The Modal -->
-							<div class="modal fade" id="deleteModal${announcement.announcementId }">
-								<div class="modal-dialog">
-									<div class="modal-content">
-
-										<!-- Modal Header -->
-										<div class="modal-header">
-											<h4 class="modal-title">Delete Announcement</h4>
-											<button type="button" class="close" data-dismiss="modal">×</button>
-										</div>
-
-										<!-- Modal body -->
-										<div class="modal-body" align="left">Are you sure you
-											want to delete the announcement?</div>
-
-										<!-- Modal footer -->
-										<div class="modal-footer">
-											<a href="${pageContext.request.contextPath}/deleteAnnouncement?announcementId=${announcement.announcementId }"><button
-													type="button" class="btn btn-primary">YES</button></a>
-											<button type="button" class="btn btn-danger"
-												data-dismiss="modal">CANCEL</button>
-										</div>
-
-									</div>
-								</div>
-							</div>
-							
-							<!-- The Modal -->
-							<div class="modal fade" id="sendModal${announcement.announcementId }">
-								<div class="modal-dialog">
-									<div class="modal-content">
-
-										<!-- Modal Header -->
-										<div class="modal-header">
-											<h4 class="modal-title">Send Announcement</h4>
-											<button type="button" class="close" data-dismiss="modal">×</button>
-										</div>
-
-										<!-- Modal body -->
-										<div class="modal-body" align="left">Are you sure you
-											want to send the announcement to student and parent?</div>
-
-										<!-- Modal footer -->
-										<div class="modal-footer">
-											<a href="${pageContext.request.contextPath}/sendAnnouncement?announcementId=${announcement.announcementId }"><button
-													type="button" class="btn btn-primary">YES</button></a>
-											<button type="button" class="btn btn-danger"
-												data-dismiss="modal">CANCEL</button>
-										</div>
-
-									</div>
-								</div>
-							</div>
 						</c:forEach>
 					</table>
 					<div class='d-flex'>
 						<ul class="pagination mx-auto">
 							<c:choose>
 								<%-- Show Prev as link if not on first page --%>
-								<c:when test="${announcementList.firstPage}">
+								<c:when test="${studentList.firstPage}">
 									<li><span class="page-link">Prev</span></li>
 								</c:when>
 								<c:otherwise>
 									<c:url value="prev" var="url" />
 									<li><a class="page-link"
-										href='<c:out value="${pageContext.request.contextPath}/searchCreator/${url}?searchCreator=${search}&submit=Search" />'>Prev</a></li>
+										href='<c:out value="${pageContext.request.contextPath}/searchStudentIC/${url}?searchStudentIC=${search}&submit=Search" />'>Prev</a></li>
 								</c:otherwise>
 							</c:choose>
-							<c:forEach begin="1" end="${announcementList.pageCount}" step="1"
+							<c:forEach begin="1" end="${studentList.pageCount}" step="1"
 								varStatus="tagStatus">
 								<c:choose>
 									<%-- In PagedListHolder page count starts from 0 --%>
-									<c:when test="${(announcementList.page + 1) == tagStatus.index}">
+									<c:when test="${(studentList.page + 1) == tagStatus.index}">
 										<li><span class="page-link">${tagStatus.index}</span></li>
 									</c:when>
 									<c:otherwise>
 										<c:url value="${tagStatus.index}" var="url" />
 										<li><a class="page-link"
-											href='<c:out value="${pageContext.request.contextPath}/searchCreator/${url}?searchCreator=${search}&submit=Search" />'>${tagStatus.index}</a></li>
+											href='<c:out value="${pageContext.request.contextPath}/searchStudentIC/${url}?searchStudentIC=${search}&submit=Search" />'>${tagStatus.index}</a></li>
 									</c:otherwise>
 								</c:choose>
 							</c:forEach>
 							<c:choose>
 								<%-- Show Next as link if not on last page --%>
-								<c:when test="${announcementList.lastPage}">
+								<c:when test="${studentList.lastPage}">
 									<li><span class="page-link">Next</span></li>
 								</c:when>
 								<c:otherwise>
 									<c:url value="next" var="url" />
 									<li><a class="page-link"
-										href='<c:out value="${pageContext.request.contextPath}/searchCreator/${url}?searchCreator=${search}&submit=Search" />'>Next</a></li>
+										href='<c:out value="${pageContext.request.contextPath}/searchStudentIC/${url}?searchStudentIC=${search}&submit=Search" />'>Next</a></li>
 								</c:otherwise>
 							</c:choose>
 						</ul>
@@ -255,7 +197,7 @@
 				</div>
 
 			</div>
-			
+
 		</section>
 	</section>
 	<!-- The Modal -->

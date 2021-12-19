@@ -127,7 +127,7 @@ public class AdminDashboardController {
 			mailMessage.setTo(userPersonalDetails.getEmail());
 			mailMessage.setSubject("Registration Completed!");
 			mailMessage.setText("To activate your account, please click the link here: "
-					+ "http://localhost:8080/SchoolInformationSystem/activate-account?token="
+					+ "http://localhost:8080/ISIMM/activate-account?token="
 					+ confirmation.getConfirmationToken() + "\n" + "Use username and password below to sign in:" + "\n"
 					+ "Username:" + user.getUsername() + "\n" + "Password:" + generatedPassword);
 			mailSender.send(mailMessage);
@@ -136,7 +136,7 @@ public class AdminDashboardController {
 			model.setViewName("successfulRegistration");
 		} else {
 
-			model.addObject("message", "Email or IC number has been registered");
+			model.addObject("message", "Email-"+existingUsername+ "<br> or <br>" +"IC number-"+existingIC+" has been registered");
 			model.setViewName("createUserPage");
 		}
 		return model;
@@ -305,14 +305,14 @@ public class AdminDashboardController {
 			}
 			String encode=URLEncoder.encode(search);
 			model.addObject("search",encode);
-			model.setViewName("searchResult");
+			model.setViewName("searchNameResult");
 		}
 		return model;
 
 	}
 
 	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/searchIC", method = RequestMethod.GET)
+	@RequestMapping(value = {"/searchIC","/searchIC/{page}"}, method = RequestMethod.GET)
 	public ModelAndView searchByIC(ModelAndView model, @RequestParam("searchIC") String search,
 			@PathVariable(required = false, name = "page") String page,
 			HttpServletRequest request, HttpServletResponse response) {
@@ -351,7 +351,53 @@ public class AdminDashboardController {
 			}
 			String encode=URLEncoder.encode(search);
 			model.addObject("search",encode);
-			model.setViewName("searchResult");
+			model.setViewName("searchICResult");
+		}
+		return model;
+
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = {"/searchRole","/searchRole/{page}"}, method = RequestMethod.GET)
+	public ModelAndView searchByRole(ModelAndView model, @RequestParam("searchRole") String search,
+			@PathVariable(required = false, name = "page") String page,
+			HttpServletRequest request, HttpServletResponse response) {
+
+		List<UserTableDisplay> roleSearchResult = userInfoDao.searchByRole(search);
+
+		if (roleSearchResult.isEmpty()|| search.isBlank()) {
+			model.addObject("Message", "No Result Found");
+			model.setViewName("noResultFound");
+
+		} else {
+			PagedListHolder<UserTableDisplay> userList;
+			if (page == null) {
+
+				userList = new PagedListHolder<UserTableDisplay>();
+				userList.setSource(roleSearchResult);
+				userList.setPageSize(10);
+				request.getSession().setAttribute("userList", userList);
+
+			} else if (page.equals("prev")) {
+
+				userList = (PagedListHolder<UserTableDisplay>) request.getSession().getAttribute("userList");
+				userList.previousPage();
+
+			} else if (page.equals("next")) {
+
+				userList = (PagedListHolder<UserTableDisplay>) request.getSession().getAttribute("userList");
+				userList.nextPage();
+
+			} else {
+
+				int pageNum = Integer.parseInt(page);
+				userList = (PagedListHolder<UserTableDisplay>) request.getSession().getAttribute("userList");
+				userList.setPage(pageNum - 1);
+
+			}
+			String encode=URLEncoder.encode(search);
+			model.addObject("search",encode);
+			model.setViewName("searchRoleResult");
 		}
 		return model;
 

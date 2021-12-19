@@ -68,9 +68,7 @@
 							new User</button></a>&nbsp;<a href="searchUser"><button
 							class="btn btn-primary">Search Users</button></a><br>
 					<br>
-
-					<div align="center">
-						<h1>User List</h1>
+						<h1>Search Result</h1>
 <c:set value="${userList}" var="userPageList" />
 						<table class="table table-hover table-bordered">
 							<thead class="thead-dark">
@@ -169,7 +167,6 @@
 					</div>
 
 				</div>
-			</div>
 		</section>
 	</section>
 	<!-- The Modal -->

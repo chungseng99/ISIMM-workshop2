@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Edit Classroom</title>
+<title>View Student</title>
 
 <link rel="stylesheet"
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -122,80 +122,75 @@
 		<section class="wrapper">
 			<div class="container pt-3 ">
 				<h3>
-					<i class="fa fa-angle-right"> &nbsp;Edit Classroom</i>
+					<i class="fa fa-angle-right"> &nbsp;View Student</i>
 				</h3>
 				<!-- BASIC FORM ELELEMNTS -->
 				<div class="row mt">
 					<div class="col-lg-12">
 						<div class="form-panel">
 							<form:form class="form-horizontal style-form needs-validation"
-								modelAttribute="classroom" action="updateClassroom"
+								modelAttribute="student" 
 								method="post" novalidate="novalidate">
-								<form:hidden path="classroomId" />
-								<div class="form-group">
-									<label class="col-sm-2 col-sm-2 control-label">Form</label>
-									<div class="col-sm-10">
-										<form:select path="form" class="form-control"
-											required="required">
-											<form:option value="" selected="selected" disabled="disabled">Choose
-												here</form:option>
-											<form:option value="1">1</form:option>
-											<form:option value="2">2</form:option>
-											<form:option value="3">3</form:option>
-											<form:option value="4">4</form:option>
-											<form:option value="5">5</form:option>
-											<form:option value="6">6</form:option>
-										</form:select>
-										<div class="invalid-feedback">Please select an option.</div>
-									</div>
+								<form:hidden path="userId" />
+								<div align="center">
+								<div class="card mt-3" style="width:200px">
+								<img class="card-img-top" src="getStudentPhoto/<c:out value='${student.userId}'/>">
 								</div>
-
+								</div><br><br><br>
 								<div class="form-group">
-									<label class="col-sm-2 col-sm-2 control-label">Class
-										Name</label>
+									<label class="col-sm-2 col-sm-2 control-label">Name</label>
 									<div class="col-sm-10">
-										<form:input path="className" class="form-control"
-											placeholder="Enter class name Eg.1A2" required="required"
-											pattern="[1-6]+[A/S]+[1-9]" />
-										<div class="invalid-feedback">Please enter the class
-											name Eg.1A2.</div>
-										<h6 style="color: red">${message}</h6>
+										<form:input path="name" class="form-control"
+											readonly="true" />
 									</div>
 								</div>
 								<div class="form-group">
-									<label class="col-sm-2 col-sm-2 control-label">Teacher</label>
+									<label class="col-sm-2 col-sm-2 control-label">IC Number</label>
 									<div class="col-sm-10">
-										<form:select path="teacherName" class="form-control"
-											required="required">
-											<form:option value="" disabled="disabled">Choose
-												here</form:option>
-											<c:forEach items="${teacherList}" var="teacher">
-												<form:option value="${teacher.name }">${teacher.userId}-${teacher.name}</form:option>
-											</c:forEach>
-										</form:select>
-										<div class="invalid-feedback">Please select an option.</div>
+										<form:input path="icNumber" class="form-control"
+											readonly="true" />
 									</div>
 								</div>
 								<div class="form-group">
-									<label class="col-sm-2 col-sm-2 control-label">Maximum
-										Participant</label>
+									<label class="col-sm-2 col-sm-2 control-label">Phone Number</label>
 									<div class="col-sm-10">
-										<form:input type="number" path="maxParticipant"
-											class="form-control"
-											placeholder="Enter maximum participant between (15-30)"
-											required="required" min="15" max="30" />
-										<div class="invalid-feedback">Please enter the class
-											name Eg.1A2.</div>
+										<form:input path="phoneNumber" class="form-control"
+											readonly="true" />
 									</div>
 								</div>
-
+								<div class="form-group">
+									<label class="col-sm-2 col-sm-2 control-label">Email</label>
+									<div class="col-sm-10">
+										<form:input path="email" class="form-control"
+											readonly="true" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 col-sm-2 control-label">Nationality</label>
+									<div class="col-sm-10">
+										<form:input path="nationality" class="form-control"
+											readonly="true" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 col-sm-2 control-label">Ethnicity</label>
+									<div class="col-sm-10">
+										<form:input path="ethnicity" class="form-control"
+											readonly="true" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 col-sm-2 control-label">Address</label>
+									<div class="col-sm-10">
+										<form:textarea path="address" class="form-control"
+											readonly="true" />
+									</div>
+								</div>
+								
+								
 								<div class="text-center">
-									<input type="submit" class="btn btn-primary btn-lg"
-										name="submit" value="SUBMIT">
-								</div>
-								<div class="text-center">
-									<input type="button" class="btn btn-danger mt-2" name="cancel"
-										value="CANCEL" onClick="history.back()">
+									<input type="button" class="btn btn-primary" name="back"
+										value="BACK" onClick="history.back()">
 								</div>
 
 							</form:form>
@@ -232,39 +227,6 @@
 			</div>
 		</div>
 	</div>
-	<script type="text/javascript">
-		var firstInput = document.getElementsByName("form")[0];
-		var secondInput = document.getElementsByName("className")[0];
-
-		function process(e) {
-			secondInput.value = e.target.value.replace(/\s/g);
-		}
-		firstInput.addEventListener("click", process);
-	</script>
-	<script type="text/javascript">
-		// Disable form submissions if there are invalid fields
-		(function() {
-			'use strict';
-			window.addEventListener('load',
-					function() {
-						// Get the forms we want to add validation styles to
-						var forms = document
-								.getElementsByClassName('needs-validation');
-						// Loop over them and prevent submission
-						var validation = Array.prototype.filter.call(forms,
-								function(form) {
-									form.addEventListener('submit', function(
-											event) {
-										if (form.checkValidity() === false) {
-											event.preventDefault();
-											event.stopPropagation();
-										}
-										form.classList.add('was-validated');
-									}, false);
-								});
-					}, false);
-		})();
-	</script>
 
 </body>
 </html>
