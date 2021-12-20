@@ -1,12 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="ISO-8859-1" isELIgnored="false"%>
+	pageEncoding="ISO-8859-1"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Student List</title>
+<title>Payment Page</title>
 
 <link rel="stylesheet"
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -85,33 +85,35 @@
 								Announcement</a></li>
 
 					</ul></li>
-				<li class="sub-menu"><a href="javascript:;"> <i
+					
+					<li class="sub-menu"><a href="javascript:;"> <i
 						class="fa fa-cogs"></i> <span>Fee</span>
 				</a>
 					<ul class="sub">
-						<li><a href="${pageContext.request.contextPath}/feePage">Fee
+						<li><a
+							href="${pageContext.request.contextPath}/feePage">Fee
 								List</a></li>
 						<li><a
-							href="${pageContext.request.contextPath}/createFeeForm">Create
-								Fee</a></li>
-
-						<li><a href="${pageContext.request.contextPath}/searchFee">Search
-								Fee</a></li>
-					</ul>
-				<li class="sub-menu"><a href="javascript:;"> <i
+							href="${pageContext.request.contextPath}/createFeeForm">Create Fee</a></li>
+							
+							<li><a
+							href="${pageContext.request.contextPath}/searchFee">Search Fee</a></li>
+							</ul>
+							
+							<li class="sub-menu"><a href="javascript:;"> <i
 						class="fa fa-cogs"></i> <span>Student</span>
 				</a>
 					<ul class="sub">
-						<li class="active"><a
+						<li><a
 							href="${pageContext.request.contextPath}/studentPage">Student
 								List</a></li>
-						<li><a
+								<li><a
 							href="${pageContext.request.contextPath}/searchStudent">Search
 								Student</a></li>
-
-
-					</ul>
-					<li class="sub-menu"><a href="javascript:;"> <i
+								
+								
+								</ul>
+								<li class="sub-menu"><a href="javascript:;"> <i
 						class="fa fa-cogs"></i> <span>Payment</span>
 				</a>
 					<ul class="sub">
@@ -124,6 +126,7 @@
 								
 								
 								</ul>
+
 			</ul>
 		</div>
 	</aside>
@@ -132,88 +135,99 @@
 
 			<div class="row mt">
 				<div class="col-lg-12">
-					<a href="${pageContext.request.contextPath}/searchStudent"><button
-							class="btn btn-primary">Search Student</button></a><br> <br>
-					<div align="center">
-					<h1>Student List</h1></div>
-					<c:set value="${student}" var="studentList" />
+				<a
+						href="${pageContext.request.contextPath}/searchPayment"><button
+							class="btn btn-primary">Search Payment</button></a><br> <br>
+	<div align="center">
+					<h1>Payment List</h1></div>
+					<c:set value="${paymentList}" var="paymentList" />
 					<table class="table table-hover table-bordered">
 						<thead class="thead-dark">
 							<tr>
 								<th>No</th>
+								<th>User Id</th>
 								<th>Name</th>
-								<th>IC Number </th>
-								<th>Email</th>
-								<th width=10%>Phone Number</th>
+								<th>Fee Id</th>
+								<th>Amount (RM)</th>
+								<th>Date</th>
+								<th>status</th>
+								
 								<th width="10%">Action</th>
 							</tr>
 						</thead>
 
-						<c:forEach items="${studentList.pageList}" var="student"
-							varStatus="status">
+						<c:forEach items="${paymentList.pageList}" var="payment" varStatus="status">
 							<tr>
 								<td>${status.index + 1}</td>
-								<td>${student.name}</td>
-								<td>${student.icNumber}</td>
-								<td>${student.email}</td>
-								<td>${student.phoneNumber}</td>
-
-
-
-
-								<td><a class="mr-3"
-									href="${pageContext.request.contextPath}/viewStudent?userId=${student.userId }"><input
+								<td>${payment.userId}</td>
+								<td>${payment.name}</td>
+								<td>${payment.feeId}</td>
+								<td><fmt:formatNumber type="number" pattern="##.00" value="${payment.paymentAmount}"/></td>
+								<td>${payment.paymentDate}</td>
+								<td style="font-size: 1em" class="mt-3 <c:choose>
+   										 <c:when test="${payment.status=='accepted'}">
+       										<c:out value="badge badge-pill badge-success"/> </c:when> 
+       										<c:when test="${payment.status=='rejected'}">
+       										<c:out value="badge badge-pill badge-danger"/>
+   											 </c:when>    
+   									 <c:otherwise>
+       											 <c:out value="badge badge-pill badge-secondary"/>
+   								 </c:otherwise>
+										</c:choose>">
+								${payment.status}</td>
+								
+								<td><a class="mr-3" href="${pageContext.request.contextPath}/viewPayment?paymentId=${payment.paymentId }"><input
 										type="button" class="btn btn-primary" value="View"></a>
-							</tr>
-						</c:forEach>
-					</table>
-					<div class='d-flex'>
+								</tr>
+								</c:forEach>
+								</table>
+								<div class='d-flex'>
 						<ul class="pagination mx-auto">
 							<c:choose>
 								<%-- Show Prev as link if not on first page --%>
-								<c:when test="${studentList.firstPage}">
+								<c:when test="${paymentList.firstPage}">
 									<li><span class="page-link">Prev</span></li>
 								</c:when>
 								<c:otherwise>
 									<c:url value="prev" var="url" />
 									<li><a class="page-link"
-										href='<c:out value="${pageContext.request.contextPath}/studentPage/${url}" />'>Prev</a></li>
+										href='<c:out value="${pageContext.request.contextPath}/paymentPage/${url}" />'>Prev</a></li>
 								</c:otherwise>
 							</c:choose>
-							<c:forEach begin="1" end="${studentList.pageCount}" step="1"
+							<c:forEach begin="1" end="${paymentList.pageCount}" step="1"
 								varStatus="tagStatus">
 								<c:choose>
 									<%-- In PagedListHolder page count starts from 0 --%>
-									<c:when test="${(studentList.page + 1) == tagStatus.index}">
+									<c:when test="${(paymentList.page + 1) == tagStatus.index}">
 										<li><span class="page-link">${tagStatus.index}</span></li>
 									</c:when>
 									<c:otherwise>
 										<c:url value="${tagStatus.index}" var="url" />
 										<li><a class="page-link"
-											href='<c:out value="${pageContext.request.contextPath}/studentPage/${url}" />'>${tagStatus.index}</a></li>
+											href='<c:out value="${pageContext.request.contextPath}/paymentPage/${url}" />'>${tagStatus.index}</a></li>
 									</c:otherwise>
 								</c:choose>
 							</c:forEach>
 							<c:choose>
 								<%-- Show Next as link if not on last page --%>
-								<c:when test="${studentList.lastPage}">
+								<c:when test="${paymentList.lastPage}">
 									<li><span class="page-link">Next</span></li>
 								</c:when>
 								<c:otherwise>
 									<c:url value="next" var="url" />
 									<li><a class="page-link"
-										href='<c:out value="${pageContext.request.contextPath}/studentPage/${url}" />'>Next</a></li>
+										href='<c:out value="${pageContext.request.contextPath}/paymentPage/${url}" />'>Next</a></li>
 								</c:otherwise>
 							</c:choose>
 						</ul>
 					</div>
-				</div>
-
-			</div>
-
-		</section>
-	</section>
-	<!-- The Modal -->
+								
+								
+								</div>
+								</div>
+								</section>
+								</section>
+									<!-- The Modal -->
 	<div class="modal fade" id="logoutModal">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -237,7 +251,8 @@
 			</div>
 		</div>
 	</div>
-
+								
+								
 
 </body>
 </html>

@@ -102,7 +102,7 @@
 						class="fa fa-cogs"></i> <span>Student</span>
 				</a>
 					<ul class="sub">
-						<li class="active"><a
+						<li ><a
 							href="${pageContext.request.contextPath}/studentPage">Student
 								List</a></li>
 						<li><a
@@ -111,6 +111,19 @@
 
 
 					</ul>
+					<li class="sub-menu"><a href="javascript:;"> <i
+						class="fa fa-cogs"></i> <span>Payment</span>
+				</a>
+					<ul class="sub">
+						<li><a
+							href="${pageContext.request.contextPath}/paymentPage">Payment
+								List</a></li>
+								<li><a
+							href="${pageContext.request.contextPath}/searchPayment">Search
+								Payment</a></li>
+								
+								
+								</ul>
 			</ul>
 		</div>
 	</aside>

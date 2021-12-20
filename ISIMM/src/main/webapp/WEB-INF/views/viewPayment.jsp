@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Create Announcement</title>
+<title>View Payment</title>
 
 <link rel="stylesheet"
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -51,7 +51,7 @@
 		<div id="sidebar" class="nav-collapse ">
 			<!-- sidebar menu start-->
 			<ul class="sidebar-menu" id="nav-accordion">
-				<li class="mt "><a 
+				<li class="mt "><a
 					href="${pageContext.request.contextPath}/clerkDashboard"> <i
 						class="fa fa-dashboard "></i> <span>Home</span>
 				</a></li>
@@ -62,7 +62,7 @@
 						<li><a
 							href="${pageContext.request.contextPath}/classroomPage">Classroom
 								List</a></li>
-						<li ><a
+						<li><a
 							href="${pageContext.request.contextPath}/createClassroomForm">Create
 								Classroom</a></li>
 						<li><a
@@ -75,7 +75,7 @@
 				</a>
 					<ul class="sub">
 						<li><a
-							href="${pageContext.request.contextPath}/announcementPage">Announcement
+							href="${pageContext.request.contextPath}/announcementList">Announcement
 								List</a></li>
 						<li class="active"><a
 							href="${pageContext.request.contextPath}/createAnnouncementForm">Create
@@ -85,34 +85,34 @@
 								Announcement</a></li>
 
 					</ul></li>
-					<li class="sub-menu"><a href="javascript:;"> <i
+
+				<li class="sub-menu"><a href="javascript:;"> <i
 						class="fa fa-cogs"></i> <span>Fee</span>
 				</a>
 					<ul class="sub">
-						<li><a
-							href="${pageContext.request.contextPath}/feePage">Fee
+						<li><a href="${pageContext.request.contextPath}/feePage">Fee
 								List</a></li>
 						<li><a
-							href="${pageContext.request.contextPath}/createFeeForm">Create Fee</a></li>
-							
-							<li><a
-							href="${pageContext.request.contextPath}/searchFee">Search Fee</a></li>
-							</ul>
-							
-							<li class="sub-menu"><a href="javascript:;"> <i
+							href="${pageContext.request.contextPath}/createFeeForm">Create
+								Fee</a></li>
+
+						<li><a href="${pageContext.request.contextPath}/searchFee">Search
+								Fee</a></li>
+					</ul>
+				<li class="sub-menu"><a href="javascript:;"> <i
 						class="fa fa-cogs"></i> <span>Student</span>
 				</a>
 					<ul class="sub">
-						<li><a
-							href="${pageContext.request.contextPath}/studentPage">Student
+						<li><a href="${pageContext.request.contextPath}/studentPage">Student
 								List</a></li>
-								<li><a
+						<li><a
 							href="${pageContext.request.contextPath}/searchStudent">Search
 								Student</a></li>
-								
-								
-								</ul>
-								<li class="sub-menu"><a href="javascript:;"> <i
+
+
+					</ul>
+					
+					<li class="sub-menu"><a href="javascript:;"> <i
 						class="fa fa-cogs"></i> <span>Payment</span>
 				</a>
 					<ul class="sub">
@@ -125,7 +125,6 @@
 								
 								
 								</ul>
-
 			</ul>
 		</div>
 	</aside>
@@ -134,50 +133,102 @@
 		<section class="wrapper">
 			<div class="container pt-3 ">
 				<h3>
-					<i class="fa fa-angle-right"> &nbsp;Create Announcement</i>
+					<i class="fa fa-angle-right"> &nbsp;View Payment</i>
 				</h3>
 				<!-- BASIC FORM ELELEMNTS -->
 				<div class="row mt">
 					<div class="col-lg-12">
 						<div class="form-panel">
-						<form:form class="form-horizontal style-form needs-validation" modelAttribute="announcement"
-								action="createAnnouncement" method="post" novalidate="novalidate">
-								<form:hidden path="announcementId"/>
-						<div class="form-group">
-									<label class="col-sm-2 col-sm-2 control-label">Title</label>
-									<div class="col-sm-10">
-										<form:input path="title" class="form-control"
-											placeholder="Enter title" required="required"/>
-										<div class="invalid-feedback">Please enter a title</div>
-											
-									</div>
+							<form:form class="form-horizontal style-form needs-validation"
+								modelAttribute="payment" method="post" novalidate="novalidate">
+								<form:hidden path="paymentId" />
+								<div align="center">
+								<div class="card" style="width:600px; height:650px">
+									<img 
+										src="getPaymentProof/<c:out value='${payment.paymentId}'/>"></div>
+
 								</div>
+								<br>
+								<br>
+								<br>
 								<div class="form-group">
-									<label class="col-sm-2 col-sm-2 control-label">Description</label>
+									<label class="col-sm-2 col-sm-2 control-label">User Id</label>
 									<div class="col-sm-10">
-										<form:textarea rows="5" path="description" class="form-control"
-											placeholder="Enter description" required="required"/>
-										<div class="invalid-feedback">Please enter a description</div>
-											
+										<form:input path="userId" class="form-control" readonly="true" />
+									</div>
+									<br> <label class="col-sm-2 col-sm-2 control-label">Name</label>
+									<div class="col-sm-10">
+										<form:input path="name" class="form-control" readonly="true" />
+										<br>
+									</div>
+									<label class="col-sm-2 col-sm-2 control-label">Fee Id</label>
+									<div class="col-sm-10">
+										<form:input path="feeId" class="form-control" readonly="true" />
+										<br>
+									</div>
+									<label class="col-sm-2 col-sm-2 control-label">Amount</label>
+									<div class="col-sm-10">
+										<form:input path="paymentAmount" class="form-control"
+											readonly="true" />
+										<br>
+									</div>
+									<label class="col-sm-2 col-sm-2 control-label">Date</label>
+									<div class="col-sm-10">
+										<form:input path="paymentDate" class="form-control"
+											readonly="true" />
+										<br>
+									</div>
+									<label class="col-sm-2 col-sm-2 control-label">Status</label>
+									<div class="col-sm-10">
+										<form:input path="status" class="form-control" readonly="true"/>
+
 									</div>
 								</div>
+								
 								<div class="text-center">
-									<input type="submit" class="btn btn-primary btn-lg mr-3"
-										name="submit" value="SUBMIT"> <input type="reset"
-										class="btn btn-danger" name="reset" value="RESET"></div>
+								<a class="mr-3" href="${pageContext.request.contextPath}/approvePayment?paymentId=${payment.paymentId }"><input
+										type="button" class="btn btn-primary btn-lg" value="Approve"></a>
+										<a href="${pageContext.request.contextPath}/rejectPayment?paymentId=${payment.paymentId }"><input
+										type="button" class="btn btn-danger" value="Reject"></a>
+										</div>
 										<div class="text-center">
 										<input type="button"
-										class="btn btn-danger mt-2" name="cancel" value="CANCEL" onClick="history.back()"></div>
+										class="btn btn-danger mt-2" name="cancel" value="CANCEL" onClick="history.back()">	
+										</div>
+
+							</form:form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</section>
+<!-- The Modal -->
+	<div class="modal fade" id="logoutModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<!-- Modal Header -->
+				<div class="modal-header">
+					<h4 class="modal-title">Logout Confirmation</h4>
+					<button type="button" class="close" data-dismiss="modal">×</button>
+				</div>
+
+				<!-- Modal body -->
+				<div class="modal-body">Are you sure you want to logout?</div>
+
+				<!-- Modal footer -->
+				<div class="modal-footer">
+					<a href="${pageContext.request.contextPath}/logout"><button
+							type="button" class="btn btn-primary">YES</button></a>
+					<button type="button" class="btn btn-danger" data-dismiss="modal">CANCEL</button>
+				</div>
+
+			</div>
+		</div>
+	</div>
 								
-								
-								</form:form>
-								</div>
-								</div>
-								</div>
-								</div>
-								</section>
-								</section>
-								
+						
 
 </body>
 </html>

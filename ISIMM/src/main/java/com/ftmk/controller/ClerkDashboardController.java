@@ -17,6 +17,7 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.support.PagedListHolder;
 import org.springframework.core.io.InputStreamSource;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
@@ -34,6 +35,7 @@ import com.ftmk.model.Announcement;
 import com.ftmk.model.ClassParticipant;
 import com.ftmk.model.Classroom;
 import com.ftmk.model.Fee;
+import com.ftmk.model.Payment;
 import com.ftmk.model.UserPersonalDetails;
 import com.ftmk.model.UserTableDisplay;
 
@@ -57,6 +59,11 @@ public class ClerkDashboardController {
 		int emptyClassroomNum=clerkDao.emptyClassroomNum();
 		List<Classroom> emptyClassroom = clerkDao.emptyClassroom();
 		
+		Double totalPaymentReceived=clerkDao.totalPaymentReceived();
+		int numberOfAcceptedStatus=clerkDao.numberOfAcceptedStatus();
+		int numberOfPendingStatus=clerkDao.numberOfPendingStatus();
+		int numberOfRejectedStatus=clerkDao.numberOfRejectedStatus();
+		
 		model.addObject("totalStudent",totalStudent);
 		model.addObject("assignedStudentNum",assignedStudentNum);
 		model.addObject("unassignedStudentNum",unassignedStudentNum);
@@ -64,6 +71,11 @@ public class ClerkDashboardController {
 		model.addObject("totalClassroom",totalClassroom);
 		model.addObject("emptyClassroom",emptyClassroom);
 		model.addObject("emptyClassroomNum", emptyClassroomNum);
+		
+		model.addObject("totalPayment",totalPaymentReceived);
+		model.addObject("accepted",numberOfAcceptedStatus);
+		model.addObject("pending",numberOfPendingStatus);
+		model.addObject("rejected",numberOfRejectedStatus);
 		
 		model.setViewName("clerkDashboard");
 		return model;
@@ -1100,5 +1112,116 @@ public class ClerkDashboardController {
 
 	}
 	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value={"/paymentPage","/paymentPage/{page}"},method=RequestMethod.GET)
+	public ModelAndView paymentPage(ModelAndView model,@PathVariable(required = false, name = "page") String page,
+			HttpServletRequest request, HttpServletResponse response) {
+		
+		List<Payment> paymentList; 
+		PagedListHolder<Payment> list;
+		if (page == null) {
+
+			list = new PagedListHolder<Payment>();
+			paymentList= clerkDao.paymentList();
+			list.setSource(paymentList);
+			list.setPageSize(10);
+			request.getSession().setAttribute("paymentList", list);
+
+		} else if (page.equals("prev")) {
+
+			list = (PagedListHolder<Payment>) request.getSession().getAttribute("paymentList");
+			list.previousPage();
+
+		} else if (page.equals("next")) {
+
+			list = (PagedListHolder<Payment>) request.getSession().getAttribute("paymentList");
+			list.nextPage();
+
+		} else {
+
+			int pageNum = Integer.parseInt(page);
+			list = (PagedListHolder<Payment>) request.getSession().getAttribute("paymentList");
+			list.setPage(pageNum - 1);
+
+		}
+		
+		model.setViewName("paymentPage");
+		return model;
+	}
+	
+	@RequestMapping(value="/viewPayment",method=RequestMethod.GET)
+	public ModelAndView viewPayment(@RequestParam Integer paymentId) {
+		
+		Payment payment = clerkDao.getPaymentById(paymentId);
+		ModelAndView model = new ModelAndView("viewPayment");
+		model.addObject("payment",payment);
+		return model;
+		
+	}
+	
+	@RequestMapping(value = "/getPaymentProof/{paymentId}")
+	public void getPaymentProof(HttpServletResponse response, @PathVariable("paymentId") int paymentId) throws Exception {
+		response.setContentType("image/jpeg, image/jpg, image/png");
+
+		Blob photo = clerkDao.getProofById(paymentId);
+
+		byte[] bytes = photo.getBytes(1, (int) photo.length());
+		InputStream inputStream = new ByteArrayInputStream(bytes);
+		IOUtils.copy(inputStream, response.getOutputStream());
+	}
+	
+	@RequestMapping(value="/approvePayment",method=RequestMethod.GET)
+	public ModelAndView approvePayment(@RequestParam Integer paymentId) {
+		
+		clerkDao.acceptPayment(paymentId);
+		Payment payment = clerkDao.getPaymentById(paymentId);
+		String email=clerkDao.getEmailById(payment.getUserId());
+		ModelAndView model = new ModelAndView();
+		
+		
+		SimpleMailMessage mailMessage = new SimpleMailMessage();
+		mailMessage.setTo(email);
+		mailMessage.setSubject("Payment Approved!");
+		mailMessage.setText("Thank you for your payment. \n"
+				+"Please click the link below to view your receipt \n"
+				+"http://localhost:8080/ISIMM/viewReceipt/AVkM"+paymentId+"WvAtcZ0LTjm29WFN");
+		mailSender.send(mailMessage);
+		
+		model.addObject("payment",payment);
+		model.setViewName("redirect:/paymentPage");
+		return model;
+		
+	}
+	
+	@RequestMapping(value="/rejectPayment",method=RequestMethod.GET)
+	public ModelAndView rejectPayment(@RequestParam Integer paymentId) {
+		
+		clerkDao.rejectPayment(paymentId);
+		Payment payment = clerkDao.getPaymentById(paymentId);
+		String email=clerkDao.getEmailById(payment.getUserId());
+		ModelAndView model = new ModelAndView("viewPDF","payment",payment);
+		
+		SimpleMailMessage mailMessage = new SimpleMailMessage();
+		mailMessage.setTo(email);
+		mailMessage.setSubject("Payment Rejected!");
+		mailMessage.setText("Sorry your payment has been rejected. \n"
+				+"This might due to: \n"
+				+"1. Unclear payment proof. \n"
+				+"2. Missing payment proof. \n\n"
+				+"Please upload a new payment proof. ");
+		mailSender.send(mailMessage);
+		
+		model.setViewName("redirect:/paymentPage");
+		return model;
+		
+	}
+	
+	@RequestMapping(value="/viewReceipt/AVkM{paymentId}WvAtcZ0LTjm29WFN")
+	public ModelAndView viewReceipt(@PathVariable("paymentId") int paymentId,@ModelAttribute(name="payment")Payment payment) {
+		
+		payment = clerkDao.getPaymentById(paymentId);
+		return new ModelAndView("viewReceipt","payment",payment);
+		
+	}
 	
 }

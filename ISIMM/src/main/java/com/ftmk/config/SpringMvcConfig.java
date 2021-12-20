@@ -19,6 +19,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.servlet.view.ResourceBundleViewResolver;
 
 import com.ftmk.dao.RegistrationDao;
 import com.ftmk.dao.UserInfoDao;
@@ -42,13 +43,27 @@ public class SpringMvcConfig implements WebMvcConfigurer{
 		return dataSource;
 	}
 	
-	@Bean
+	@Bean(name="JSPViewResolver")
 	public ViewResolver getViewResolver() {
 
+		
 		InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+		resolver.setOrder(2);
 		resolver.setPrefix("/WEB-INF/views/");
 		resolver.setSuffix(".jsp");
 
+		return resolver;
+
+	}
+	
+	@Bean(name="PDFResolver")
+	public ViewResolver getResourceViewResolver() {
+
+		
+		ResourceBundleViewResolver resolver = new ResourceBundleViewResolver();
+		resolver.setOrder(1);
+		resolver.setBasename("pdf-view");
+		
 		return resolver;
 
 	}

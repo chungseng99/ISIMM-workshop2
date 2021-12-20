@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -111,6 +112,18 @@
 								<li><a
 							href="${pageContext.request.contextPath}/searchStudent">Search
 								Student</a></li>
+								</ul>
+								
+								<li class="sub-menu"><a href="javascript:;"> <i
+						class="fa fa-cogs"></i> <span>Payment</span>
+				</a>
+					<ul class="sub">
+						<li><a
+							href="${pageContext.request.contextPath}/paymentPage">Payment
+								List</a></li>
+								<li><a
+							href="${pageContext.request.contextPath}/searchPayment">Search
+								Payment</a></li>
 								
 								
 								</ul>
@@ -172,19 +185,19 @@
 				<div class="col-md-4 col-sm-4 mb">
 					<div class="card bg-dark text-white">
 						<div class="card-header">
-							<h5>Total Payment Received: </h5>
+							<h5>Total Payment Received: RM <fmt:formatNumber type="number" pattern="##.00" value="${totalPayment}"/></h5>
 						</div>
 						<div class="card-body">
 							<h5>
-								<i class="fa fa-hdd-o"></i> Number of <span style="color:green">accepted</span> status:
+								<i class="fa fa-hdd-o"></i> Number of <span style="color:green">accepted</span> status: ${accepted}
 							</h5>
-							<h5>Number of pending status:</h5>
-							<h5>Number of <span style="color:red">rejected</span> status:</h5>
+							<h5>Number of pending status: ${pending}</h5>
+							<h5>Number of <span style="color:red">rejected</span> status: ${rejected }</h5>
 							
 					</div>
 					<div class="card-footer">
-							<a href="${pageContext.request.contextPath}/feePage"><button
-									class="btn btn-primary float-right">Fee List</button></a>
+							<a href="${pageContext.request.contextPath}/paymentPage"><button
+									class="btn btn-primary float-right">Payment List</button></a>
 									</div>
 				</div>
 			</div>
