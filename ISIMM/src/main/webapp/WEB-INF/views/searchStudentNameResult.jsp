@@ -111,6 +111,18 @@
 
 
 					</ul>
+					
+					<li class="sub-menu"><a href="javascript:;"> <i
+						class="fa fa-cogs"></i> <span>Teacher</span>
+				</a>
+					<ul class="sub">
+						<li><a
+							href="${pageContext.request.contextPath}/teacherPage">Teacher
+								List</a></li>
+								<li><a
+							href="${pageContext.request.contextPath}/searchTeacher">Search
+								Teacher</a></li>
+								</ul>
 					<li class="sub-menu"><a href="javascript:;"> <i
 						class="fa fa-cogs"></i> <span>Payment</span>
 				</a>
@@ -124,6 +136,14 @@
 								
 								
 								</ul>
+								
+									<li class="sub-menu"><a href="javascript:;"> <i
+						class="fa fa-cogs"></i> <span>Subject</span>
+				</a>
+					<ul class="sub">
+						<li><a
+							href="${pageContext.request.contextPath}/subjectPage">Subject
+								List</a></li></ul>
 			</ul>
 		</div>
 	</aside>
@@ -134,8 +154,7 @@
 				<div class="col-lg-12">
 					<a href="${pageContext.request.contextPath}/searchStudent"><button
 							class="btn btn-primary">Search Student</button></a><br> <br>
-					<div align="center">
-					<h1>Search Result</h1></div>
+					<h1>Search Result</h1>
 					<c:set value="${student}" var="studentList" />
 					<table class="table table-hover table-bordered">
 						<thead class="thead-dark">

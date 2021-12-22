@@ -2,6 +2,8 @@ package com.ftmk.model;
 
 import java.sql.Blob;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public class UserPersonalDetails {
 	
 	private Integer userDetailId;
@@ -14,7 +16,9 @@ public class UserPersonalDetails {
 	private String nationality;
 	private String ethnicity;
 	private String maritalStatus;
+	private String occupation;
 	private Blob picture;
+	private MultipartFile photo;
 	private UserInfo user;
 	
 		
@@ -90,6 +94,18 @@ public class UserPersonalDetails {
 	}
 	public void setIcNumber(String icNumber) {
 		this.icNumber = icNumber;
+	}
+	public MultipartFile getPhoto() {
+		return photo;
+	}
+	public void setPhoto(MultipartFile photo) {
+		this.photo = photo;
+	}
+	public String getOccupation() {
+		return occupation;
+	}
+	public void setOccupation(String occupation) {
+		this.occupation = occupation;
 	}
 	
 

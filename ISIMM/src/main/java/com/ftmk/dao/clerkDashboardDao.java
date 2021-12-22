@@ -18,11 +18,13 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ftmk.model.Announcement;
 import com.ftmk.model.Classroom;
 import com.ftmk.model.Fee;
 import com.ftmk.model.Payment;
+import com.ftmk.model.Subject;
 import com.ftmk.model.UserPersonalDetails;
 import com.ftmk.model.UserTableDisplay;
 
@@ -90,7 +92,9 @@ public class clerkDashboardDao {
 
 	public List<Classroom> classroomList() {
 		// Select certain field from each table to be displayed in admin dashboard
-		String sql = "SELECT * FROM classroom ORDER BY class_name";
+		String sql = "SELECT classroom.*,(classroom.maximum_participant- (SELECT COUNT(classroom_id) FROM "
+				+ "class_participant WHERE classroom.classroom_id=class_participant.classroom_id)) "
+				+ "AS slot FROM classroom ORDER BY class_name";
 		List<Classroom> list = jdbcTemplate.query(sql, new RowMapper<Classroom>() {
 
 			@Override
@@ -102,6 +106,7 @@ public class clerkDashboardDao {
 				classroom.setForm(rs.getInt("form"));
 				classroom.setTeacherName(rs.getString("class_teacher_name"));
 				classroom.setMaxParticipant(rs.getInt("maximum_participant"));
+				classroom.setSlot(rs.getInt("slot"));
 				return classroom;
 			}
 		});
@@ -110,7 +115,9 @@ public class clerkDashboardDao {
 
 	public Classroom getClassroomById(Integer classroomId) {
 		// Select certain field from each table to be displayed in admin dashboard
-		String sql = "SELECT * FROM classroom WHERE classroom_id=" + "'" + classroomId + "'";
+		String sql = "SELECT classroom.*,(classroom.maximum_participant- (SELECT COUNT(classroom_id) FROM "
+				+"class_participant WHERE classroom.classroom_id=class_participant.classroom_id)) "
+				+"AS slot FROM classroom WHERE classroom_id=" + "'" + classroomId + "'";
 
 		return jdbcTemplate.query(sql, new ResultSetExtractor<Classroom>() {
 
@@ -125,6 +132,7 @@ public class clerkDashboardDao {
 					classroom.setForm(rs.getInt("form"));
 					classroom.setTeacherName(rs.getString("class_teacher_name"));
 					classroom.setMaxParticipant(rs.getInt("maximum_participant"));
+					classroom.setSlot(rs.getInt("slot"));
 					return classroom;
 				}
 				return null;
@@ -157,8 +165,8 @@ public class clerkDashboardDao {
 	}
 
 	public List<UserPersonalDetails> unassignedStudentList() {
-		// Select certain field from each table to be displayed in admin dashboard
-		String sql = "SELECT user_details.user_id,user_details.name,user_details.ic_number FROM user_details JOIN user_role ON "
+
+		String sql = "SELECT user_details.* FROM user_details JOIN user_role ON "
 				+ "user_details.user_id=user_role.user_id JOIN users ON user_details.user_id=users.user_id  "
 				+ "WHERE user_details.user_id NOT IN (SELECT class_participant.user_id FROM class_participant) AND "
 				+ "user_role.role='STUDENT' AND users.enabled=1";
@@ -172,6 +180,12 @@ public class clerkDashboardDao {
 				user.setUserId(rs.getInt("user_id"));
 				user.setName(rs.getString("name"));
 				user.setIcNumber(rs.getString("ic_number"));
+				user.setEmail(rs.getString("email"));
+				user.setPhoneNumber(rs.getString("phone_number"));
+				user.setAddress(rs.getString("address"));
+				user.setNationality(rs.getString("nationality"));
+				user.setEthnicity(rs.getString("ethnicity"));
+				user.setPicture(rs.getBlob("picture"));
 				return user;
 			}
 		});
@@ -231,6 +245,50 @@ public class clerkDashboardDao {
 			}
 
 		});
+	}
+	
+	public UserPersonalDetails getUserByUsername(String username) {
+		String sql = "SELECT user_details.* FROM user_details JOIN users ON "
+				+ "user_details.user_id=users.user_id WHERE users.username=" + "'" + username + "'";
+
+		return jdbcTemplate.query(sql, new ResultSetExtractor<UserPersonalDetails>() {
+
+			@Override
+			public UserPersonalDetails extractData(ResultSet rs) throws SQLException, DataAccessException {
+
+				if (rs.next()) {
+
+					UserPersonalDetails user = new UserPersonalDetails();
+					user.setUserId(rs.getInt("user_id"));
+					user.setName(rs.getString("name"));
+					user.setIcNumber(rs.getString("ic_number"));
+					user.setEmail(rs.getString("email"));
+					user.setPhoneNumber(rs.getString("phone_number"));
+					user.setAddress(rs.getString("address"));
+					user.setNationality(rs.getString("nationality"));
+					user.setEthnicity(rs.getString("ethnicity"));
+					user.setPicture(rs.getBlob("picture"));
+					user.setMaritalStatus(rs.getString("marital_status"));
+					user.setOccupation(rs.getString("occupation"));
+					return user;
+				}
+				return null;
+
+			}
+
+		});
+	}
+	
+	public int updateProfile(UserPersonalDetails user, Integer userId, MultipartFile photo) throws IOException {
+		
+		byte[] photoBytes = photo.getBytes();
+		String sql="UPDATE user_details SET email=?, name=?, ic_number=?, phone_number=?,"
+				+ "address=?, nationality=?, ethnicity=?,occupation=?, marital_status=?, picture=? "
+				+ "WHERE user_id=?";
+		return jdbcTemplate.update(sql,new Object[] {user.getEmail(),user.getName(),user.getIcNumber(),
+				user.getPhoneNumber(),user.getAddress(),user.getNationality(),user.getEthnicity()
+				,user.getOccupation(),user.getMaritalStatus(),photoBytes,userId});
+		
 	}
 
 	public Blob getPhotoById(int userId) {
@@ -337,6 +395,143 @@ public class clerkDashboardDao {
 				+ "WHERE user_role.role='STUDENT' AND users.enabled=1";
 		return jdbcTemplate.queryForObject(sql, Integer.class);
 	}
+	
+	
+	public List<UserPersonalDetails> getTeacherList() {
+		// Select certain field from each table to be displayed in admin dashboard
+		String sql = "SELECT user_details.* FROM user_details JOIN user_role ON user_details.user_id=user_role.user_id JOIN "
+				+ "users ON user_details.user_id=users.user_id WHERE user_role.role='TEACHER' AND users.enabled=1";
+
+		List<UserPersonalDetails> list = jdbcTemplate.query(sql, new RowMapper<UserPersonalDetails>() {
+
+			@Override
+			public UserPersonalDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				UserPersonalDetails user = new UserPersonalDetails();
+				user.setUserId(rs.getInt("user_id"));
+				user.setName(rs.getString("name"));
+				user.setIcNumber(rs.getString("ic_number"));
+				user.setEmail(rs.getString("email"));
+				user.setPhoneNumber(rs.getString("phone_number"));
+				user.setAddress(rs.getString("address"));
+				user.setNationality(rs.getString("nationality"));
+				user.setEthnicity(rs.getString("ethnicity"));
+				user.setPicture(rs.getBlob("picture"));
+				return user;
+			}
+		});
+		return list;
+	}
+
+	public UserPersonalDetails getTeacherById(Integer userId) {
+		String sql = "SELECT * FROM user_details WHERE user_id=" + "'" + userId + "'";
+
+		return jdbcTemplate.query(sql, new ResultSetExtractor<UserPersonalDetails>() {
+
+			@Override
+			public UserPersonalDetails extractData(ResultSet rs) throws SQLException, DataAccessException {
+
+				if (rs.next()) {
+
+					UserPersonalDetails user = new UserPersonalDetails();
+					user.setUserId(rs.getInt("user_id"));
+					user.setName(rs.getString("name"));
+					user.setIcNumber(rs.getString("ic_number"));
+					user.setEmail(rs.getString("email"));
+					user.setPhoneNumber(rs.getString("phone_number"));
+					user.setAddress(rs.getString("address"));
+					user.setNationality(rs.getString("nationality"));
+					user.setEthnicity(rs.getString("ethnicity"));
+					user.setPicture(rs.getBlob("picture"));
+					return user;
+				}
+				return null;
+
+			}
+
+		});
+	}
+	
+	public List<UserPersonalDetails> searchTeacherByName(String search) {
+		// Select certain field from each table to be displayed in admin dashboard
+		String sql = "SELECT user_details.* FROM user_details JOIN user_role ON user_details.user_id=user_role.user_id JOIN "
+				+ "users ON user_details.user_id=users.user_id WHERE user_role.role='TEACHER' AND "
+				+ "users.enabled=1 AND user_details.name LIKE " + "'%" + search + "%'";
+
+		List<UserPersonalDetails> list = jdbcTemplate.query(sql, new RowMapper<UserPersonalDetails>() {
+
+			@Override
+			public UserPersonalDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				UserPersonalDetails user = new UserPersonalDetails();
+				user.setUserId(rs.getInt("user_id"));
+				user.setName(rs.getString("name"));
+				user.setIcNumber(rs.getString("ic_number"));
+				user.setEmail(rs.getString("email"));
+				user.setPhoneNumber(rs.getString("phone_number"));
+				user.setAddress(rs.getString("address"));
+				user.setNationality(rs.getString("nationality"));
+				user.setEthnicity(rs.getString("ethnicity"));
+				user.setPicture(rs.getBlob("picture"));
+				return user;
+			}
+		});
+		return list;
+	}
+
+	public List<UserPersonalDetails> searchTeacherByIC(String search) {
+		// Select certain field from each table to be displayed in admin dashboard
+		String sql = "SELECT user_details.* FROM user_details JOIN user_role ON user_details.user_id=user_role.user_id JOIN "
+				+ "users ON user_details.user_id=users.user_id WHERE user_role.role='TEACHER' AND "
+				+ "users.enabled=1 AND user_details.ic_number LIKE " + "'%" + search + "%'";
+
+		List<UserPersonalDetails> list = jdbcTemplate.query(sql, new RowMapper<UserPersonalDetails>() {
+
+			@Override
+			public UserPersonalDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				UserPersonalDetails user = new UserPersonalDetails();
+				user.setUserId(rs.getInt("user_id"));
+				user.setName(rs.getString("name"));
+				user.setIcNumber(rs.getString("ic_number"));
+				user.setEmail(rs.getString("email"));
+				user.setPhoneNumber(rs.getString("phone_number"));
+				user.setAddress(rs.getString("address"));
+				user.setNationality(rs.getString("nationality"));
+				user.setEthnicity(rs.getString("ethnicity"));
+				user.setPicture(rs.getBlob("picture"));
+				return user;
+			}
+		});
+		return list;
+	}
+
+	public List<UserPersonalDetails> searchTeacherByEmail(String search) {
+		// Select certain field from each table to be displayed in admin dashboard
+		String sql = "SELECT user_details.* FROM user_details JOIN user_role ON user_details.user_id=user_role.user_id JOIN "
+				+ "users ON user_details.user_id=users.user_id WHERE user_role.role='TEACHER' AND "
+				+ "users.enabled=1 AND user_details.email LIKE " + "'%" + search + "%'";
+
+		List<UserPersonalDetails> list = jdbcTemplate.query(sql, new RowMapper<UserPersonalDetails>() {
+
+			@Override
+			public UserPersonalDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				UserPersonalDetails user = new UserPersonalDetails();
+				user.setUserId(rs.getInt("user_id"));
+				user.setName(rs.getString("name"));
+				user.setIcNumber(rs.getString("ic_number"));
+				user.setEmail(rs.getString("email"));
+				user.setPhoneNumber(rs.getString("phone_number"));
+				user.setAddress(rs.getString("address"));
+				user.setNationality(rs.getString("nationality"));
+				user.setEthnicity(rs.getString("ethnicity"));
+				user.setPicture(rs.getBlob("picture"));
+				return user;
+			}
+		});
+		return list;
+	}
 
 	public int totalClassroom() {
 
@@ -367,12 +562,6 @@ public class clerkDashboardDao {
 		return list;
 	}
 
-	public int getStudentCount(Integer classroomId) {
-
-		String sql = "SELECT COUNT(classroom_id) FROM class_participant WHERE classroom_id=?";
-		return jdbcTemplate.queryForObject(sql, new Object[] { classroomId }, Integer.class);
-
-	}
 
 	public List<UserPersonalDetails> participantList(Integer classroomId) {
 		// Select certain field from each table to be displayed in admin dashboard
@@ -412,7 +601,9 @@ public class clerkDashboardDao {
 
 	public List<Classroom> searchClassroomByName(String search) {
 		// Select certain field from each table to be displayed in admin dashboard
-		String sql = "SELECT * FROM classroom WHERE classroom.class_name LIKE " + "'%" + search + "%'";
+		String sql = "SELECT classroom.*,(classroom.maximum_participant- (SELECT COUNT(classroom_id) FROM "
+				+ "class_participant WHERE classroom.classroom_id=class_participant.classroom_id))"
+				+ "AS slot FROM classroom WHERE classroom.class_name LIKE " + "'%" + search + "%'";
 		List<Classroom> list = jdbcTemplate.query(sql, new RowMapper<Classroom>() {
 
 			@Override
@@ -424,6 +615,7 @@ public class clerkDashboardDao {
 				classroom.setForm(rs.getInt("form"));
 				classroom.setTeacherName(rs.getString("class_teacher_name"));
 				classroom.setMaxParticipant(rs.getInt("maximum_participant"));
+				classroom.setSlot(rs.getInt("slot"));
 				return classroom;
 			}
 		});
@@ -432,7 +624,9 @@ public class clerkDashboardDao {
 
 	public List<Classroom> searchClassroomByTeacherName(String search) {
 		// Select certain field from each table to be displayed in admin dashboard
-		String sql = "SELECT * FROM classroom WHERE classroom.class_teacher_name LIKE " + "'%" + search + "%'";
+		String sql = "SELECT classroom.*,(classroom.maximum_participant- (SELECT COUNT(classroom_id) FROM "
+				+ "class_participant WHERE classroom.classroom_id=class_participant.classroom_id))"
+				+ "AS slot FROM classroom WHERE classroom.class_teacher_name LIKE " + "'%" + search + "%'";
 		List<Classroom> list = jdbcTemplate.query(sql, new RowMapper<Classroom>() {
 
 			@Override
@@ -444,6 +638,7 @@ public class clerkDashboardDao {
 				classroom.setForm(rs.getInt("form"));
 				classroom.setTeacherName(rs.getString("class_teacher_name"));
 				classroom.setMaxParticipant(rs.getInt("maximum_participant"));
+				classroom.setSlot(rs.getInt("slot"));
 				return classroom;
 			}
 		});
@@ -452,7 +647,9 @@ public class clerkDashboardDao {
 
 	public List<Classroom> searchClassroomByForm(String search) {
 		// Select certain field from each table to be displayed in admin dashboard
-		String sql = "SELECT * FROM classroom WHERE classroom.form LIKE " + "'%" + search + "%'";
+		String sql = "SELECT classroom.*,(classroom.maximum_participant- (SELECT COUNT(classroom_id) FROM "
+				+ "class_participant WHERE classroom.classroom_id=class_participant.classroom_id))"
+				+ "AS slot FROM classroom WHERE classroom.form LIKE " + "'%" + search + "%'";
 		List<Classroom> list = jdbcTemplate.query(sql, new RowMapper<Classroom>() {
 
 			@Override
@@ -464,6 +661,7 @@ public class clerkDashboardDao {
 				classroom.setForm(rs.getInt("form"));
 				classroom.setTeacherName(rs.getString("class_teacher_name"));
 				classroom.setMaxParticipant(rs.getInt("maximum_participant"));
+				classroom.setSlot(rs.getInt("slot"));
 				return classroom;
 			}
 		});
@@ -811,15 +1009,15 @@ public class clerkDashboardDao {
 		return jdbcTemplate.queryForObject(sql, Integer.class);
 
 	}
-	
-	public List<Payment> paymentList(){
-		
-		String sql="SELECT payment.*,user_details.name FROM payment JOIN user_details ON payment.user_id=user_details.user_id";
+
+	public List<Payment> paymentList() {
+
+		String sql = "SELECT payment.*,user_details.name FROM payment JOIN user_details ON payment.user_id=user_details.user_id";
 		List<Payment> list = jdbcTemplate.query(sql, new RowMapper<Payment>() {
 
 			@Override
 			public Payment mapRow(ResultSet rs, int rowNum) throws SQLException {
-				
+
 				Payment payment = new Payment();
 				payment.setPaymentId(rs.getInt("payment_id"));
 				payment.setPaymentAmount(rs.getDouble("payment_amount"));
@@ -833,7 +1031,7 @@ public class clerkDashboardDao {
 		});
 		return list;
 	}
-	
+
 	public Payment getPaymentById(Integer paymentId) {
 		// Select certain field from each table to be displayed in admin dashboard
 		String sql = "SELECT payment.*,user_details.name FROM payment JOIN user_details ON "
@@ -862,9 +1060,9 @@ public class clerkDashboardDao {
 			}
 
 		});
-		
+
 	}
-	
+
 	public Blob getProofById(int paymentId) {
 
 		String query = "SELECT payment_proof FROM payment where payment_id=?";
@@ -873,25 +1071,128 @@ public class clerkDashboardDao {
 
 		return photo;
 	}
-	
+
 	public int acceptPayment(Integer paymentId) {
-		
-		String sql="UPDATE payment SET status='accepted' WHERE payment_id="+paymentId;
+
+		String sql = "UPDATE payment SET status='accepted' WHERE payment_id=" + paymentId;
 		return jdbcTemplate.update(sql);
-		
+
 	}
-	
+
 	public int rejectPayment(Integer paymentId) {
-		
-		String sql="UPDATE payment SET status='rejected' WHERE payment_id="+paymentId;
+
+		String sql = "UPDATE payment SET status='rejected' WHERE payment_id=" + paymentId;
 		return jdbcTemplate.update(sql);
+
+	}
+
+	public String getEmailById(Integer userId) {
+
+		String sql = "SELECT email FROM user_details WHERE user_id=?";
+		return jdbcTemplate.queryForObject(sql, new Object[] { userId }, String.class);
+
+	}
+
+	public List<Payment> searchPaymentByName(String search) {
+
+		String sql = "SELECT payment.*,user_details.name FROM db_sis.payment JOIN user_details ON "
+				+ "payment.user_id=user_details.user_id WHERE user_details.name LIKE " + "'%" + search + "%'";
+		List<Payment> list = jdbcTemplate.query(sql, new RowMapper<Payment>() {
+
+			@Override
+			public Payment mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				Payment payment = new Payment();
+				payment.setPaymentId(rs.getInt("payment_id"));
+				payment.setPaymentAmount(rs.getDouble("payment_amount"));
+				payment.setPaymentDate(rs.getDate("payment_date"));
+				payment.setStatus(rs.getString("status"));
+				payment.setFeeId(rs.getInt("fee_id"));
+				payment.setUserId(rs.getInt("user_id"));
+				payment.setName(rs.getString("name"));
+				return payment;
+			}
+		});
+		return list;
+	}
+
+	public List<Payment> searchPaymentByStatus(String search) {
+
+		String sql = "SELECT payment.*,user_details.name FROM db_sis.payment JOIN user_details ON "
+				+ "payment.user_id=user_details.user_id WHERE payment.status LIKE " + "'%" + search + "%'";
+		List<Payment> list = jdbcTemplate.query(sql, new RowMapper<Payment>() {
+
+			@Override
+			public Payment mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				Payment payment = new Payment();
+				payment.setPaymentId(rs.getInt("payment_id"));
+				payment.setPaymentAmount(rs.getDouble("payment_amount"));
+				payment.setPaymentDate(rs.getDate("payment_date"));
+				payment.setStatus(rs.getString("status"));
+				payment.setFeeId(rs.getInt("fee_id"));
+				payment.setUserId(rs.getInt("user_id"));
+				payment.setName(rs.getString("name"));
+				return payment;
+			}
+		});
+		return list;
+	}
+
+	public List<Payment> searchPaymentByFeeId(String search) {
+
+		String sql = "SELECT payment.*,user_details.name FROM db_sis.payment JOIN user_details ON "
+				+ "payment.user_id=user_details.user_id WHERE fee_id LIKE " + "'%" + search + "%'";
+		List<Payment> list = jdbcTemplate.query(sql, new RowMapper<Payment>() {
+
+			@Override
+			public Payment mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				Payment payment = new Payment();
+				payment.setPaymentId(rs.getInt("payment_id"));
+				payment.setPaymentAmount(rs.getDouble("payment_amount"));
+				payment.setPaymentDate(rs.getDate("payment_date"));
+				payment.setStatus(rs.getString("status"));
+				payment.setFeeId(rs.getInt("fee_id"));
+				payment.setUserId(rs.getInt("user_id"));
+				payment.setName(rs.getString("name"));
+				return payment;
+			}
+		});
+		return list;
+	}
+	
+	public List<Subject> subjectList(){
+		
+		String sql="SELECT * FROM subject";
+		List<Subject> list = jdbcTemplate.query(sql, new RowMapper<Subject>() {
+
+			@Override
+			public Subject mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				Subject subject = new Subject();
+				subject.setSubjectId(rs.getInt("subject_id"));
+				subject.setSubjectName(rs.getString("subject_name"));
+				return subject;
+			}
+		});
+		return list;
 		
 	}
 	
-	public String getEmailById(Integer userId) {
+	public int deleteSubject(Integer subjectId) {
+
+		String sql = "DELETE FROM subject WHERE subject_id=?";
+		return jdbcTemplate.update(sql, subjectId);
+
+	}
+	
+	public int AddSubject(Subject subject) {
 		
-		String sql="SELECT email FROM user_details WHERE user_id=?";
-		return jdbcTemplate.queryForObject(sql, new Object[] {userId},String.class);
+		String sql="INSERT INTO subject (subject_name) VALUES (?)";
+		return jdbcTemplate.update(sql,subject.getSubjectName());
 		
 	}
+	
+	
 }

@@ -92,7 +92,7 @@
 					<ul class="sub">
 						<li><a href="${pageContext.request.contextPath}/feePage">Fee
 								List</a></li>
-						<li><a
+						<li class="active"><a
 							href="${pageContext.request.contextPath}/createFeeForm">Create
 								Fee</a></li>
 						<li><a href="${pageContext.request.contextPath}/searchFee">Search
@@ -112,6 +112,19 @@
 								
 								
 								</ul>
+								
+								<li class="sub-menu"><a href="javascript:;"> <i
+						class="fa fa-cogs"></i> <span>Teacher</span>
+				</a>
+					<ul class="sub">
+						<li><a
+							href="${pageContext.request.contextPath}/teacherPage">Teacher
+								List</a></li>
+								<li><a
+							href="${pageContext.request.contextPath}/searchTeacher">Search
+								Teacher</a></li>
+								</ul>
+								
 								<li class="sub-menu"><a href="javascript:;"> <i
 						class="fa fa-cogs"></i> <span>Payment</span>
 				</a>
@@ -125,6 +138,14 @@
 								
 								
 								</ul>
+								
+									<li class="sub-menu"><a href="javascript:;"> <i
+						class="fa fa-cogs"></i> <span>Subject</span>
+				</a>
+					<ul class="sub">
+						<li><a
+							href="${pageContext.request.contextPath}/subjectPage">Subject
+								List</a></li></ul>
 			</ul>
 		</div>
 	</aside>

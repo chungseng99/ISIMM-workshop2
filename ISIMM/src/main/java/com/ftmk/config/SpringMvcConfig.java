@@ -14,6 +14,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -129,6 +131,13 @@ public class SpringMvcConfig implements WebMvcConfigurer{
 	BCryptPasswordEncoder passwordEncoder() {
 		
 		return new BCryptPasswordEncoder();
+		
+	}
+	
+	@Bean
+	public MultipartResolver multipartResolver() {
+		
+		return new CommonsMultipartResolver();
 		
 	}
 

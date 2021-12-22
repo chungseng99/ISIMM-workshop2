@@ -57,7 +57,7 @@ body {
 									number</label>
 								<div class="col-sm-10">
 									<input type="text" name="icNumber" class="form-control"
-										placeholder="Enter IC number without dash" pattern="[0-9]{12}"
+										placeholder="Enter IC number without hyphen('-' )" pattern="[0-9]{12}"
 										required="required">
 									<div class="invalid-feedback">Please enter a valid IC
 										number</div>

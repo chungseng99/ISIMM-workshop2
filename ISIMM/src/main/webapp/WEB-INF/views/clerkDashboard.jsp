@@ -38,6 +38,8 @@
 		<div class="top-menu">
 			<nav class="navbar">
 				<ul class="nav top-menu ml-auto">
+				<li class="nav-item mt-2 mr-2"><a class="logout"
+						href="profile">Profile</a></li>
 					<li class="nav-item mt-2 mr-2"><a class="logout"
 						href="redirectChangePassword">Change Password</a></li>
 					<li class="nav-item mt-2"><a class="logout"
@@ -115,6 +117,18 @@
 								</ul>
 								
 								<li class="sub-menu"><a href="javascript:;"> <i
+						class="fa fa-cogs"></i> <span>Teacher</span>
+				</a>
+					<ul class="sub">
+						<li><a
+							href="${pageContext.request.contextPath}/teacherPage">Teacher
+								List</a></li>
+								<li><a
+							href="${pageContext.request.contextPath}/searchTeacher">Search
+								Teacher</a></li>
+								</ul>
+								
+								<li class="sub-menu"><a href="javascript:;"> <i
 						class="fa fa-cogs"></i> <span>Payment</span>
 				</a>
 					<ul class="sub">
@@ -127,6 +141,14 @@
 								
 								
 								</ul>
+								
+								<li class="sub-menu"><a href="javascript:;"> <i
+						class="fa fa-cogs"></i> <span>Subject</span>
+				</a>
+					<ul class="sub">
+						<li><a
+							href="${pageContext.request.contextPath}/subjectPage">Subject
+								List</a></li></ul>
 
 			</ul>
 		</div>
@@ -148,7 +170,7 @@
 								${unassignedStudentNum }
 							</h5>
 							<br>
-							<h5>Total Student Assigned: ${assignedStudentNum }</h5>
+							<h5>Total Student Assigned to Classroom: ${assignedStudentNum }</h5>
 							<br>
 						</div>
 						<div class="card-footer">
@@ -201,6 +223,83 @@
 									</div>
 				</div>
 			</div>
+			
+			<div class="col-lg-12">
+					<div align="center">
+					<hr><br><br>
+					<h1>Unassigned Student List</h1></div>
+					<c:set value="${student}" var="studentList" />
+					<table class="table table-hover table-bordered">
+						<thead class="thead-dark">
+							<tr>
+								<th>No</th>
+								<th>Name</th>
+								<th>IC Number </th>
+								<th>Email</th>
+								<th width=10%>Phone Number</th>
+								<th width="10%">Action</th>
+							</tr>
+						</thead>
+
+						<c:forEach items="${studentList.pageList}" var="student"
+							varStatus="status">
+							<tr>
+								<td>${status.index + 1}</td>
+								<td>${student.name}</td>
+								<td>${student.icNumber}</td>
+								<td>${student.email}</td>
+								<td>${student.phoneNumber}</td>
+
+
+
+
+								<td><a class="mr-3"
+									href="${pageContext.request.contextPath}/viewStudent?userId=${student.userId }"><input
+										type="button" class="btn btn-primary" value="View"></a>
+							</tr>
+						</c:forEach>
+					</table>
+					<div class='d-flex'>
+						<ul class="pagination mx-auto">
+							<c:choose>
+								<%-- Show Prev as link if not on first page --%>
+								<c:when test="${studentList.firstPage}">
+									<li><span class="page-link">Prev</span></li>
+								</c:when>
+								<c:otherwise>
+									<c:url value="prev" var="url" />
+									<li><a class="page-link"
+										href='<c:out value="${pageContext.request.contextPath}/clerkDashboard/${url}" />'>Prev</a></li>
+								</c:otherwise>
+							</c:choose>
+							<c:forEach begin="1" end="${studentList.pageCount}" step="1"
+								varStatus="tagStatus">
+								<c:choose>
+									<%-- In PagedListHolder page count starts from 0 --%>
+									<c:when test="${(studentList.page + 1) == tagStatus.index}">
+										<li><span class="page-link">${tagStatus.index}</span></li>
+									</c:when>
+									<c:otherwise>
+										<c:url value="${tagStatus.index}" var="url" />
+										<li><a class="page-link"
+											href='<c:out value="${pageContext.request.contextPath}/clerkDashboard/${url}" />'>${tagStatus.index}</a></li>
+									</c:otherwise>
+								</c:choose>
+							</c:forEach>
+							<c:choose>
+								<%-- Show Next as link if not on last page --%>
+								<c:when test="${studentList.lastPage}">
+									<li><span class="page-link">Next</span></li>
+								</c:when>
+								<c:otherwise>
+									<c:url value="next" var="url" />
+									<li><a class="page-link"
+										href='<c:out value="${pageContext.request.contextPath}/clerkDashboard/${url}" />'>Next</a></li>
+								</c:otherwise>
+							</c:choose>
+						</ul>
+					</div>
+				</div>
 			</div>
 		</section>
 	</section>

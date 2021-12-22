@@ -77,7 +77,7 @@
 						<li><a
 							href="${pageContext.request.contextPath}/announcementList">Announcement
 								List</a></li>
-						<li class="active"><a
+						<li><a
 							href="${pageContext.request.contextPath}/createAnnouncementForm">Create
 								Announcement</a></li>
 						<li><a
@@ -112,6 +112,19 @@
 								
 								
 								</ul>
+								
+								<li class="sub-menu"><a href="javascript:;"> <i
+						class="fa fa-cogs"></i> <span>Teacher</span>
+				</a>
+					<ul class="sub">
+						<li><a
+							href="${pageContext.request.contextPath}/teacherPage">Teacher
+								List</a></li>
+								<li><a
+							href="${pageContext.request.contextPath}/searchTeacher">Search
+								Teacher</a></li>
+								</ul>
+								
 								<li class="sub-menu"><a href="javascript:;"> <i
 						class="fa fa-cogs"></i> <span>Payment</span>
 				</a>
@@ -125,6 +138,14 @@
 								
 								
 								</ul>
+								
+									<li class="sub-menu"><a href="javascript:;"> <i
+						class="fa fa-cogs"></i> <span>Subject</span>
+				</a>
+					<ul class="sub">
+						<li><a
+							href="${pageContext.request.contextPath}/subjectPage">Subject
+								List</a></li></ul>
 
 			</ul>
 		</div>
@@ -161,7 +182,7 @@
 										
 										<div class="text-center mt-3">
 											<input type="submit" class="btn btn-primary btn-lg mr-3"
-												name="submit" value="Add"  <c:if test="${studentCount == 0}"><c:out value="disabled='disabled'"/></c:if>>
+												name="submit" value="Add"  <c:if test="${classroom.slot==0}"><c:out value="disabled='disabled'"/></c:if>>
 										</div>
 									</div>
 
@@ -169,7 +190,7 @@
 							</form:form>
 							<h5 class="ml-2">Maximum Participant: ${classroom.maxParticipant }</h5>
 							
-							<h5 class="ml-2" <c:if test="${studentCount == 0}"><c:out value="style=color:red"/></c:if>>Available Slot: ${studentCount}</h5>
+							<h5 class="ml-2" <c:if test="${classroom.slot == 0}"><c:out value="style=color:red"/></c:if>>Available Slot: ${classroom.slot}</h5>
 							
 							<table class="table table-hover table-bordered">
 						<thead class="thead-dark">

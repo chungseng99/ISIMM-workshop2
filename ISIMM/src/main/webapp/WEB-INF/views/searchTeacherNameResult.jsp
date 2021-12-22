@@ -112,6 +112,19 @@
 								
 								
 								</ul>
+								
+								<li class="sub-menu"><a href="javascript:;"> <i
+						class="fa fa-cogs"></i> <span>Teacher</span>
+				</a>
+					<ul class="sub">
+						<li><a
+							href="${pageContext.request.contextPath}/teacherPage">Teacher
+								List</a></li>
+								<li><a
+							href="${pageContext.request.contextPath}/searchTeacher">Search
+								Teacher</a></li>
+								</ul>
+								
 								<li class="sub-menu"><a href="javascript:;"> <i
 						class="fa fa-cogs"></i> <span>Payment</span>
 				</a>
@@ -125,6 +138,14 @@
 								
 								
 								</ul>
+								
+									<li class="sub-menu"><a href="javascript:;"> <i
+						class="fa fa-cogs"></i> <span>Subject</span>
+				</a>
+					<ul class="sub">
+						<li><a
+							href="${pageContext.request.contextPath}/subjectPage">Subject
+								List</a></li></ul>
 
 			</ul>
 		</div>
@@ -150,8 +171,9 @@
 								<th>Form</th>
 								<th>Teacher Name</th>
 								<th width=10%>Maximum Participant</th>
+								<th width=10%>Available slot</th>
 
-								<th width="25%">Action</th>
+								<th width="20%">Action</th>
 							</tr>
 						</thead>
 
@@ -162,14 +184,15 @@
 								<td>${classroom.form}</td>
 								<td>${classroom.teacherName}</td>
 								<td>${classroom.maxParticipant}</td>
+								<td>${classroom.slot}</td>
 
 
 
 
 								<td><a class="mr-3" href="${pageContext.request.contextPath}/editClassroom?classroomId=${classroom.classroomId }"><input
 										type="button" class="btn btn-primary" value="Edit"></a>
-										<a href="${pageContext.request.contextPath}/manageParticipant?classroomId=${classroom.classroomId }"><input 
-										type="button" class="btn btn-primary" value="Manage Participant"></a>
+										<div class="mt-2"><a href="${pageContext.request.contextPath}/manageParticipant?classroomId=${classroom.classroomId }"><input 
+										type="button" class="btn btn-primary" value="Manage Participant"></a></div>
 									<div class="mt-2"> <a data-toggle="modal"
 									href="#deleteModal${classroom.classroomId }"><input type="button"
 										class="btn btn-danger" value="Delete"></a></div></td>

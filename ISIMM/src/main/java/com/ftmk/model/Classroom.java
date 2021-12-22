@@ -7,6 +7,7 @@ public class Classroom {
 	private Integer form;
 	private String teacherName;
 	private Integer maxParticipant;
+	private Integer slot;
 	
 	public Integer getClassroomId() {
 		return classroomId;
@@ -37,6 +38,12 @@ public class Classroom {
 	}
 	public void setMaxParticipant(Integer maxParticipant) {
 		this.maxParticipant = maxParticipant;
+	}
+	public Integer getSlot() {
+		return slot;
+	}
+	public void setSlot(Integer slot) {
+		this.slot = slot;
 	}
 	
 	
