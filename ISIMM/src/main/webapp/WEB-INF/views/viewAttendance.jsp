@@ -2,11 +2,12 @@
 	pageEncoding="ISO-8859-1" isELIgnored="false"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Manage Participant</title>
+<title>View Attendance</title>
 
 <link rel="stylesheet"
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -155,102 +156,47 @@
 		<section class="wrapper">
 			<div class="container pt-3 ">
 				<h3>
-					<i class="fa fa-angle-right"> &nbsp;Manage Participant</i>
+					<i class="fa fa-angle-right"> &nbsp;Attendance</i>
 				</h3>
+				<br>
+				<div class="container bg-dark text-white pt-3 pb-3">
+				<h4>
+				
+      
+				Name: ${user.name} <br><br>
+				Class: ${className} <br><br>
+				Attendance Percentage: <c:choose><c:when test="${percentage=='NaN'}">0.00%</c:when>
+				<c:otherwise><fmt:formatNumber type="number" pattern="##.00" value="${percentage}"/>% </c:otherwise></c:choose><br><br>
+				Number of days absent: ${absent }<br><br>
+				
+				<a class="mr-3"
+									href="${pageContext.request.contextPath}/printAttendance?userId=${userId }" target="_blank"><input
+										type="button" class="btn btn-primary" value="Print Attendance" ></a>
+										<input type="button" class="btn btn-danger" name="cancel"
+										value="Back" onClick="history.back()">
+				</h4></div>
 				<!-- BASIC FORM ELELEMNTS -->
 				<div class="row mt">
 					<div class="col-lg-12">
-						<div class="form-panel">
-						<h4 class="ml-2">Selected Classroom: ${classroom.className}</h4>
-						<a href="${pageContext.request.contextPath}/classroomPage"><button class="btn btn-primary ml-3">Select another classroom</button></a><hr>
-							<form:form class="form-horizontal style-form needs-validation"
-								modelAttribute="classParticipant" action="addStudent"
-								method="post" novalidate="novalidate">
-								<form:hidden path="classroomId"
-									value="${classroom.classroomId }" />
-								<div class="form-group">
-									<label class="col-sm-2 col-sm-2 control-label">Form</label>
-									<div class="col-sm-10">
-										<form:select path="userId" class="form-control"
-											required="required">
-											<form:option value="" selected="selected" disabled="disabled">Choose
-												here</form:option>
-											<c:forEach items="${studentList}" var="student">
-												<form:option value="${student.userId }">${student.userId}-${student.name} ${student.icNumber }</form:option>
-											</c:forEach>
-										</form:select>
-										
-										<div class="text-center mt-3">
-											<input type="submit" class="btn btn-primary btn-lg mr-3"
-												name="submit" value="Add"  <c:if test="${classroom.slot==0}"><c:out value="disabled='disabled'"/></c:if>>
-										</div>
-									</div>
-
-								</div>
-							</form:form>
-							<h5 class="ml-2">Maximum Participant: ${classroom.maxParticipant }</h5>
-							
-							<h5 class="ml-2" <c:if test="${classroom.slot == 0}"><c:out value="style=color:red"/></c:if>>Available Slot: ${classroom.slot}</h5>
-							
 							<table class="table table-hover table-bordered">
 						<thead class="thead-dark">
 							<tr>
 								<th>No</th>
-								<th>Name</th>
-								<th>IC Number</th>
-								<th>Email</th>
-								<th width="15%">Action</th>
+								<th>Attendance Name</th>
+								<th>Attendance Date</th>
+								<th>Status</th>
 							</tr>
 						</thead>
 
-						<c:forEach items="${participant}" var="participant" varStatus="status">
+						<c:forEach items="${attendance}" var="attendance" varStatus="status">
 							<tr>
 								<td>${status.index + 1}</td>
-								<td>${participant.name}</td>
-								<td>${participant.icNumber}</td>
-								<td>${participant.email}</td>
+								<td>${attendance.attendanceName}</td>
+								<td>${attendance.attendanceDate}</td>
+								<td <c:if test="${attendance.status=='absent'}"><c:out value = "style=color:red;"/></c:if>>${attendance.status}</td>
 								
-
-								<td>
-								<a href="${pageContext.request.contextPath}/viewAttendance?userId=${participant.userId}"><input
-										type="button" class="btn btn-primary" value="View Attendance"></a>
-										<div class="mt-3">	
-										<a href="${pageContext.request.contextPath}/viewReportCard?userId=${participant.userId}"><input
-										type="button" class="btn btn-primary" value="View Report Card"></a></div>
-								<div class="mt-3">		
-								<a data-toggle="modal" href="#deleteModal${participant.userId}"><input
-										type="button" class="btn btn-danger" value="Remove"></a></div>
-										</td>
-										</tr>
-										<!-- The Modal -->
-							<div class="modal fade" id="deleteModal${participant.userId}">
-								<div class="modal-dialog">
-									<div class="modal-content">
-
-										<!-- Modal Header -->
-										<div class="modal-header">
-											<h4 class="modal-title">Remove Student</h4>
-											<button type="button" class="close" data-dismiss="modal">×</button>
-										</div>
-
-										<!-- Modal body -->
-										<div class="modal-body" align="left">Are you sure you
-											want to remove the student from this class?</div>
-
-										<!-- Modal footer -->
-										<div class="modal-footer">
-											<a href="${pageContext.request.contextPath}/removeStudent?userId=${participant.userId}"><button
-													type="button" class="btn btn-primary">YES</button></a>
-											<button type="button" class="btn btn-danger"
-												data-dismiss="modal">CANCEL</button>
-										</div>
-
-									</div>
-								</div>
-							</div>
 										</c:forEach>
 										</table>
-						</div>
 					</div>
 				</div>
 			</div>

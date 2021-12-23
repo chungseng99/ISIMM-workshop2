@@ -145,6 +145,9 @@
 
 
 							</form>
+								<div class="text-center">
+					<button class="btn btn-danger mt-2" name="cancel" onclick="history.back()"> CANCEL
+							</button></div>
 						</div>
 					</div>
 				</div>

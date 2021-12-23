@@ -21,9 +21,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ftmk.model.Announcement;
+import com.ftmk.model.Attendance;
 import com.ftmk.model.Classroom;
 import com.ftmk.model.Fee;
 import com.ftmk.model.Payment;
+import com.ftmk.model.ReportCard;
 import com.ftmk.model.Subject;
 import com.ftmk.model.UserPersonalDetails;
 import com.ftmk.model.UserTableDisplay;
@@ -80,6 +82,14 @@ public class clerkDashboardDao {
 			}
 		});
 
+	}
+	
+	public String getClassNameByUserId(Integer userId) {
+		// Search username in database
+
+		String sql = "SELECT classroom.class_name FROM classroom JOIN class_participant ON "
+				+ "classroom.classroom_id=class_participant.classroom_id WHERE class_participant.user_id="+userId;
+		return jdbcTemplate.queryForObject(sql, String.class);
 	}
 
 	public int createClassroom(Classroom classroom) {
@@ -1192,6 +1202,95 @@ public class clerkDashboardDao {
 		String sql="INSERT INTO subject (subject_name) VALUES (?)";
 		return jdbcTemplate.update(sql,subject.getSubjectName());
 		
+	}
+	
+	public List<Attendance> AttendanceById(Integer userId) {
+		// Select certain field from each table to be displayed in admin dashboard
+		String sql = "SELECT attendance_record.*,attendance.*,user_details.name FROM attendance_record "
+				+ "JOIN attendance ON attendance_record.attendance_id=attendance.attendance_id "
+				+ "JOIN user_details ON user_details.user_id=attendance_record.user_id WHERE attendance_record.user_id="+userId;
+		List<Attendance> list = jdbcTemplate.query(sql, new RowMapper<Attendance>() {
+
+			@Override
+			public Attendance mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				Attendance attendance = new Attendance();
+				attendance.setAttendanceId(rs.getInt("attendance_id"));
+				attendance.setAttendanceName(rs.getString("attendance_name"));
+				attendance.setAttendanceDate(rs.getDate("attendance_time"));
+				attendance.setName(rs.getString("name"));
+				attendance.setStatus(rs.getString("status"));
+				attendance.setUserId(rs.getInt("user_id"));
+				return attendance;
+			}
+		});
+		return list;
+	}
+	
+	public Double getPresentCount(Integer userId) {
+		// Search username in database
+
+		String sql = "SELECT COUNT(status) FROM attendance_record JOIN attendance ON "
+				+ "attendance_record.attendance_id=attendance.attendance_id WHERE "
+				+ "status='present'AND YEAR(attendance.attendance_time)=YEAR(curdate()) AND attendance_record.user_id="+userId;
+		return jdbcTemplate.queryForObject(sql, Double.class);
+	}
+	
+	public Double getTotalAttendanceCount(Integer userId) {
+		// Search username in database
+
+		String sql = "SELECT COUNT(status) FROM attendance_record JOIN attendance ON "
+				+ "attendance_record.attendance_id=attendance.attendance_id WHERE "
+				+ "YEAR(attendance.attendance_time)=YEAR(curdate()) AND attendance_record.user_id="+userId;
+		return jdbcTemplate.queryForObject(sql, Double.class);
+	}
+	
+	public List<ReportCard> reportCardById(Integer userId) {
+		// Select certain field from each table to be displayed in admin dashboard
+		String sql = "SELECT report_card.*,subject.subject_name,result.grade FROM report_card JOIN result ON "
+				+ "report_card.result_id=result.result_id JOIN subject ON "
+				+ "result.subject_id=subject.subject_id WHERE report_card.user_id="+userId;
+		List<ReportCard> list = jdbcTemplate.query(sql, new RowMapper<ReportCard>() {
+
+			@Override
+			public ReportCard mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				ReportCard report = new ReportCard();
+				report.setReportCardId(rs.getInt("report_card_id"));
+				report.setUserId(rs.getInt("user_id"));
+				report.setAttendanceReport(rs.getDouble("attendance_report"));
+				report.setAttitudeReport(rs.getString("attitude_report"));
+				report.setSubjectName(rs.getString("subject_name"));
+				report.setGrade(rs.getDouble("grade"));
+				return report;
+				
+			}
+		});
+		return list;
+	}
+	
+	public String teacherComment(Integer userId) {
+		
+		String sql= "SELECT attitude_report FROM report_card WHERE attitude_report IS NOT NULL AND user_id="+userId;
+		return jdbcTemplate.query(sql, new ResultSetExtractor<String>() {
+			@Override
+			public String extractData(ResultSet rs) throws SQLException, DataAccessException {
+				return rs.next() ? rs.getString("attitude_report") : null;
+			}
+		});
+				
+	}
+	
+	public Double attendancePercentage(Integer userId) {
+		
+		String sql= "SELECT attendance_report FROM report_card WHERE attendance_report IS NOT NULL AND user_id="+userId;
+		return jdbcTemplate.query(sql, new ResultSetExtractor<Double>() {
+			@Override
+			public Double extractData(ResultSet rs) throws SQLException, DataAccessException {
+				return rs.next() ? rs.getDouble("attendance_report") : 0.0;
+			}
+		});
+				
 	}
 	
 	

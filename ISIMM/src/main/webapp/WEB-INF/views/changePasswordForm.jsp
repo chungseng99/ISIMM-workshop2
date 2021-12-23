@@ -34,16 +34,16 @@ body {
 		class="needs-validation" novalidate>
 					<h2 class="form-login-heading">Change Password</h2>
 					<br> <label for="password">New Password:</label> <input
-						type='password' class="form-control" name='password' id='password'
-						required="required" autofocus="autofocus"
-						placeholder="Enter new password">
+						type='password' class="form-control" name='password' id='password' minlength="8"
+						required="required" autofocus="autofocus" 
+						placeholder="Enter new password" >
+						<div class="invalid-feedback">Enter password of at least 8 characters </div>
 
-					<div class="invalid-feedback">Please enter password.</div>
 					<br> <label for="confirmPassword">Confirm password:</label> <input
 						type='password' class="form-control" name='confirmPassword'
 						id='confirmPassword' required="required"
-						placeholder="Enter password">
-					<div class="invalid-feedback">Please enter password.</div>
+						placeholder="Enter password" minlength="8">
+					<div class="invalid-feedback">Enter password of at least 8 characters </div>
 
 
 					<br>
@@ -91,13 +91,27 @@ body {
 			var pw2 = document.getElementById("confirmPassword").value;
 			var passLength1=document.getElementById("password").value.length;
 			var passLength2=document.getElementById("confirmPassword").value.length;
-			if ((pw1 === pw2)&&(passLength1 != 0)&&(passLength2 != 0)) {
+			if ((pw1 === pw2)&&(passLength1 != 0)&&(passLength2 != 0)&&(passLength1 >= 8)&&(passLength2 >= 8)) {
 				
 			alert("Passwords successfully changed");
 				document.getElementById("myForm").submit();
 				return true;
 				
-		} else{
+		} else if((pw1 === pw2)&&(passLength1 < 8)&&(passLength2 < 8)&&(passLength1 != 0)&&(passLength2 != 0)){
+			
+			alert("Enter at least 8 characters");
+			event.preventDefault();
+			event.stopPropagation();
+		
+		
+		}else if((passLength1 == 0)&&(passLength2 == 0)){
+		
+			alert("Passwords is empty");
+			event.preventDefault();
+			event.stopPropagation();
+		
+		
+		}else{
 				alert("Passwords did not match");
 				event.preventDefault();
 				event.stopPropagation();

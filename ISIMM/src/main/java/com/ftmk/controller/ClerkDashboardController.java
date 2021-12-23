@@ -34,10 +34,12 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.ftmk.dao.clerkDashboardDao;
 import com.ftmk.model.Announcement;
+import com.ftmk.model.Attendance;
 import com.ftmk.model.ClassParticipant;
 import com.ftmk.model.Classroom;
 import com.ftmk.model.Fee;
 import com.ftmk.model.Payment;
+import com.ftmk.model.ReportCard;
 import com.ftmk.model.Subject;
 import com.ftmk.model.UserPersonalDetails;
 import com.ftmk.model.UserTableDisplay;
@@ -1672,5 +1674,90 @@ public class ClerkDashboardController {
 		}
 		
 	}
+	
+	@RequestMapping(value="/viewAttendance",method=RequestMethod.GET)
+	public ModelAndView viewAttendance(@RequestParam(name="userId")int userId) {
+		
+		UserPersonalDetails user= clerkDao.getStudentById(userId);
+		String className= clerkDao.getClassNameByUserId(userId);
+		List<Attendance> attendance = clerkDao.AttendanceById(userId);
+		double totalAttendance=clerkDao.getTotalAttendanceCount(userId);
+		double presentCount=clerkDao.getPresentCount(userId);
+		int absentCount= (int) (totalAttendance-presentCount);
+		double attendancePercentage=(presentCount/totalAttendance)*100;
+		
+		ModelAndView model = new ModelAndView("viewAttendance");
+		model.addObject("attendance",attendance);
+		model.addObject("user",user);
+		model.addObject("className",className);
+		model.addObject("absent",absentCount);
+		model.addObject("percentage",attendancePercentage);
+		model.addObject("userId",userId);
+		return model;
+		
+	}
+	
+	@RequestMapping(value = "/printAttendance", method=RequestMethod.GET )
+	public ModelAndView printAttendance(@RequestParam(name="userId")int userId) {
+
+		UserPersonalDetails user= clerkDao.getStudentById(userId);
+		String className= clerkDao.getClassNameByUserId(userId);
+		List<Attendance> attendance = clerkDao.AttendanceById(userId);
+		Double totalAttendance=clerkDao.getTotalAttendanceCount(userId);
+		Double presentCount=clerkDao.getPresentCount(userId);
+		int absentCount= (int) (totalAttendance-presentCount);
+		double attendancePercentage=(presentCount/totalAttendance)*100;
+		
+		ModelAndView model = new ModelAndView("printAttendance");
+		model.addObject("attendance",attendance);
+		model.addObject("user",user);
+		model.addObject("className",className);
+		model.addObject("absent",absentCount);
+		model.addObject("percentage",attendancePercentage);
+		return model;
+		
+	}
+	
+	@RequestMapping(value="/viewReportCard",method=RequestMethod.GET)
+	public ModelAndView viewReportCard(@RequestParam(name="userId")int userId) {
+		
+		UserPersonalDetails user= clerkDao.getStudentById(userId);
+		String className= clerkDao.getClassNameByUserId(userId);
+		List<ReportCard> report = clerkDao.reportCardById(userId);
+		String comment=clerkDao.teacherComment(userId);
+		Double attendance=clerkDao.attendancePercentage(userId);
+		
+		ModelAndView model = new ModelAndView("viewReportCard");
+		model.addObject("user",user);
+		model.addObject("className",className);
+		model.addObject("userId",userId);
+		model.addObject("report",report);
+		model.addObject("comment",comment);
+		model.addObject("attendance",attendance);
+		return model;
+		
+	}
+	
+	@RequestMapping(value="/printReportCard",method=RequestMethod.GET)
+	public ModelAndView printReportCard(@RequestParam(name="userId")int userId) {
+		
+		UserPersonalDetails user= clerkDao.getStudentById(userId);
+		String className= clerkDao.getClassNameByUserId(userId);
+		List<ReportCard> report = clerkDao.reportCardById(userId);
+		String comment=clerkDao.teacherComment(userId);
+		Double attendance=clerkDao.attendancePercentage(userId);
+		
+		ModelAndView model = new ModelAndView("printReportCard");
+		model.addObject("user",user);
+		model.addObject("className",className);
+		model.addObject("userId",userId);
+		model.addObject("report",report);
+		model.addObject("comment",comment);
+		model.addObject("attendance",attendance);
+		return model;
+		
+	}
+	
+	
 
 }
