@@ -12,8 +12,9 @@ public class UserMapper implements RowMapper<UserInfo>{
 		
 		String username=rs.getString("username");
 		String password=rs.getString("password");
+		boolean enabled=rs.getBoolean("enabled");
 		
-		return new UserInfo(username,password);
+		return new UserInfo(username,password,enabled);
 		
 	}
 	

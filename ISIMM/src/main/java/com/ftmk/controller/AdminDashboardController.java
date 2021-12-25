@@ -133,10 +133,10 @@ public class AdminDashboardController {
 			mailSender.send(mailMessage);
 
 			model.addObject("email", userPersonalDetails.getEmail());
-			model.setViewName("successfulRegistration");
+			model.setViewName("successfulRegistrationAdmin");
 		} else {
 
-			model.addObject("message", "Email-"+existingUsername+ "<br> or <br>" +"IC number-"+existingIC+" has been registered");
+			model.addObject("message", "Username-"+existingUsername+ "<br> or <br>" +"IC number-"+existingIC+" has been registered");
 			model.setViewName("createUserPage");
 		}
 		return model;
@@ -162,12 +162,33 @@ public class AdminDashboardController {
 		userInfoDao.deactivateUser(userId);
 		return new ModelAndView("redirect:/adminDashboard");
 	}
+	
+	@RequestMapping(value = "/delete", method = RequestMethod.GET)
+	public ModelAndView deleteUser(@RequestParam Integer userId) {
+
+		userInfoDao.deleteUser(userId);
+		return new ModelAndView("redirect:/adminDashboard");
+	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
 	public ModelAndView updateUser(@ModelAttribute("userList") UserTableDisplay user) {
 
+		String checkIC=registerDao.searchIC(user.getIcNumber());
+		String checkICUsername = registerDao.searchICByUsername(user.getIcNumber(),user.getUsername());
+		
+		if(checkICUsername!=null||checkIC==null) {
+			
 		userInfoDao.updateUser(user);
 		return new ModelAndView("redirect:/adminDashboard");
+		
+		}else {
+			
+			ModelAndView model = new ModelAndView("editUserForm");
+			model.addObject("userList", user);
+			model.addObject("message", "IC number has been registered");
+			return model;
+			
+		}
 
 	}
 
@@ -429,7 +450,6 @@ public class AdminDashboardController {
 		}else if (role.equals("STUDENT")) {
 			 return "";
 		}else 
-			
 		return "403";
 		
 		

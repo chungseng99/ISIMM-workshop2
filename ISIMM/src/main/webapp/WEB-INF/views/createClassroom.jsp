@@ -217,8 +217,7 @@
 											class="form-control"
 											placeholder="Enter maximum participant between (15-30)"
 											required="required" min="15" max="30" />
-										<div class="invalid-feedback">Please enter the class
-											name Eg.1A2.</div>
+										<div class="invalid-feedback">Please enter number between 15-30.</div>
 									</div>
 								</div>
 

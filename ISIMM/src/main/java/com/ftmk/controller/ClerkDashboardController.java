@@ -530,7 +530,9 @@ public class ClerkDashboardController {
 				MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 				helper.setTo(InternetAddress.parse(combinedEmail));
 				helper.setSubject(announcement.getTitle());
-				helper.setText(announcement.getDescription());
+				helper.setText("Integrated School Information Management and Monitoring System\n"+ 
+				"________________________________________________________________________________\n\n"
+				+announcement.getDescription());
 
 			}
 		};
@@ -1201,7 +1203,9 @@ public class ClerkDashboardController {
 		SimpleMailMessage mailMessage = new SimpleMailMessage();
 		mailMessage.setTo(email);
 		mailMessage.setSubject("Payment Approved!");
-		mailMessage.setText("Thank you for your payment. \n" + "Please click the link below to view your receipt \n"
+		mailMessage.setText("Integrated School Information Management and Monitoring System\n"+ 
+				"________________________________________________________________________________\n\n"+
+				"Thank you for your payment. \n" + "Please click the link below to view your receipt \n"
 				+ "http://localhost:8080/ISIMM/viewReceipt/AVkM" + paymentId + "WvAtcZ0LTjm29WFN");
 		mailSender.send(mailMessage);
 
@@ -1222,7 +1226,8 @@ public class ClerkDashboardController {
 		SimpleMailMessage mailMessage = new SimpleMailMessage();
 		mailMessage.setTo(email);
 		mailMessage.setSubject("Payment Rejected!");
-		mailMessage.setText(
+		mailMessage.setText("Integrated School Information Management and Monitoring System\n"+ 
+				"________________________________________________________________________________\n\n"+
 				"Sorry your payment has been rejected. \n" + "This might due to: \n" + "1. Unclear payment proof. \n"
 						+ "2. Missing payment proof. \n\n" + "Please upload a new payment proof. ");
 		mailSender.send(mailMessage);

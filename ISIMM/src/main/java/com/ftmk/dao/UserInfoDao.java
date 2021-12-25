@@ -192,6 +192,12 @@ public class UserInfoDao {
 		return jdbcTemplate.update(sql);
 	}
 	
+	public int deleteUser(Integer userId) {
+		
+		String sql= "DELETE FROM users WHERE user_id="+userId;
+		return jdbcTemplate.update(sql);
+	}
+	
 	public int changePassword(String password,String username) {
 		
 		String sql="UPDATE users SET users.password=? WHERE users.username=?";

@@ -16,10 +16,11 @@ public class UserInfo {
 		this.enabled = enabled;
 	}
 
-	public UserInfo(String username, String password) {
+	public UserInfo(String username, String password,boolean enabled) {
 		super();
 		this.username = username;
 		this.password = password;
+		this.enabled=enabled;
 	}
 	
 	public UserInfo() {

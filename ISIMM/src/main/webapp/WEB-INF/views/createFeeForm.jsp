@@ -168,18 +168,16 @@
 									<div class="col-sm-10">
 										<input type="text" name="feeName" class="form-control"
 											placeholder="Enter fee title" required="required">
-										<div class="invalid-feedback">Please fill out this
-											field.</div>
+										<div class="invalid-feedback">Please enter a title.</div>
 									</div>
 								</div>
 								<div class="form-group">
 									<label class="col-sm-2 col-sm-2 control-label">Fee
-										title</label>
+										Description</label>
 									<div class="col-sm-10">
 										<textarea name="feeDescription" class="form-control" rows="3"
 											placeholder="Enter fee description" required="required"></textarea>
-										<div class="invalid-feedback">Please fill out this
-											field.</div>
+										<div class="invalid-feedback">Please enter description.</div>
 									</div>
 								</div>
 								<div class="form-group">

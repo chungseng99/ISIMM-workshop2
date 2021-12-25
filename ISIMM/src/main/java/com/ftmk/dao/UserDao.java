@@ -26,7 +26,7 @@ public class UserDao extends JdbcDaoSupport {
 
 	public UserInfo findUser(String username) {
 
-		String sql = "SELECT username,password FROM users WHERE username=?";
+		String sql = "SELECT username,password,enabled FROM users WHERE username=?";
 
 		Object[] params = new Object[] { username };
 

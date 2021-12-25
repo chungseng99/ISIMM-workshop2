@@ -80,6 +80,13 @@ public class RegistrationDao {
 	    });
 	}
 	
+	public String userEmail(String username) {
+		
+		String sql="SELECT user_details.email FROM user_details JOIN users ON user_details.user_id=users.user_id WHERE username=?";
+		return jdbcTemplate.queryForObject(sql, new Object[] {username},String.class);
+		
+	}
+	
 	public String searchIC(String icNumber) {
 		//Search username in database
 		

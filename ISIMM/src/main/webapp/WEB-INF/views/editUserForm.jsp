@@ -91,6 +91,7 @@
 											placeholder="Enter IC number without dash"
 											pattern="[0-9]{12}" required="required" />
 										<div class="invalid-feedback">Please enter a valid IC.</div>
+										<h6 style="color:red">${message}</h6>
 									</div>
 								</div>
 								<div class="form-group">
@@ -157,8 +158,8 @@
 								</div>
 							</form:form>
 							<div class="text-center">
-							<button class="btn btn-danger mt-3" name="cancel" onclick="history.back()"> CANCEL
-							</button></div>
+							<a href="${pageContext.request.contextPath}/adminDashboard"><button class="btn btn-danger mt-3" name="cancel"> CANCEL
+							</button></a></div>
 							<div class="text-center mt-3">
 							</div>
 						</div>
@@ -195,13 +196,6 @@
     </div>
     
 	<script type="text/javascript">
-		var firstInput = document.getElementsByName("email")[0];
-		var secondInput = document.getElementsByName("username")[0];
-
-		function process(e) {
-			secondInput.value = e.target.value.replace(/\s/g);
-		}
-		firstInput.addEventListener("input", process);
 
 		// Disable form submissions if there are invalid fields
 		(function() {

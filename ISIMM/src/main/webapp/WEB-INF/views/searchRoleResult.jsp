@@ -99,7 +99,11 @@
 											type="button" class="btn btn-primary" value="Edit"></a>
 										&nbsp;&nbsp;&nbsp;&nbsp; <a data-toggle="modal"
 										href="#deactivateModal${user.userId }"><input type="button"
-											class="btn btn-danger" value="Deactivate"></a></td>
+											class="btn btn-danger" value="Deactivate"></a>
+											<div class="mt-2">
+											<a data-toggle="modal" 
+										href="#deleteModal${user.userId }"><input type="button" <c:if test="${user.enabled==true}"><c:out value="disabled='disabled'"/></c:if>
+											class="btn btn-danger" value="Delete"></a></div></td>
 
 								</tr>
 								<!-- The Modal -->
@@ -120,6 +124,32 @@
 											<!-- Modal footer -->
 											<div class="modal-footer">
 												<a href="${pageContext.request.contextPath}/deactivate?userId=${user.userId}"><button
+														type="button" class="btn btn-primary">YES</button></a>
+												<button type="button" class="btn btn-danger"
+													data-dismiss="modal">CANCEL</button>
+											</div>
+
+										</div>
+									</div>
+								</div>
+								<!-- The Modal -->
+								<div class="modal fade" id="deleteModal${user.userId }">
+									<div class="modal-dialog">
+										<div class="modal-content">
+
+											<!-- Modal Header -->
+											<div class="modal-header">
+												<h4 class="modal-title">Delete user</h4>
+												<button type="button" class="close" data-dismiss="modal">×</button>
+											</div>
+
+											<!-- Modal body -->
+											<div class="modal-body" align="left">Are you sure you want to
+												delete the user?</div>
+
+											<!-- Modal footer -->
+											<div class="modal-footer">
+												<a href="delete?userId=${user.userId}"><button
 														type="button" class="btn btn-primary">YES</button></a>
 												<button type="button" class="btn btn-danger"
 													data-dismiss="modal">CANCEL</button>

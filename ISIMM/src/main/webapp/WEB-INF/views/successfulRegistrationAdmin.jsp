@@ -25,11 +25,10 @@ body {
 </head>
 <body>
 	<div class="container mt-5 text-center bg-secondary text-dark">
-		<h1>Registration success!</h1>
+		<h1>User successfully created.</h1>
 		<h2>
-			Activation link has been sent to ${email}. <br>Please check your
-			inbox. Click <a href="${pageContext.request.contextPath}">here</a> to
-			sign in
+			Activation link has been sent to ${email}. <br>Click <a href="${pageContext.request.contextPath}/createUser">here</a> to
+			to go back.
 		</h2>
 	</div>
 </body>

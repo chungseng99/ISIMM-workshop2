@@ -36,7 +36,7 @@ body {
 					<br> <label for="username">Username:</label> <input
 						type='text' class="form-control" name='username'
 						required="required" autofocus="autofocus"
-						placeholder="Enter email">
+						placeholder="Enter username">
 
 					<div class="invalid-feedback">Please enter a valid email.</div>
 					<br> <label for="icNumber">IC Number:</label> <input
@@ -53,8 +53,8 @@ body {
 					</div>
 					</form>
 				<div class="text-center">
-					<button class="btn btn-danger mt-3" name="cancel"
-						onclick="history.back()">CANCEL</button>
+					<a href="${pageContext.request.contextPath}"><button class="btn btn-danger mt-3" name="cancel"
+						>CANCEL</button></a>
 				</div>
 			</div>
 			</div>

@@ -106,7 +106,7 @@ body {
 		
 		}else if((passLength1 == 0)&&(passLength2 == 0)){
 		
-			alert("Passwords is empty");
+			alert("Please fill in both field");
 			event.preventDefault();
 			event.stopPropagation();
 		

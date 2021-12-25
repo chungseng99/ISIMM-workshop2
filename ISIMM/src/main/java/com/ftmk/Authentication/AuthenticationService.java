@@ -26,11 +26,10 @@ public class AuthenticationService implements UserDetailsService{
 		UserInfo user = userDao.findUser(username);
 		
 		 System.out.println("UserInfo= " + user);
+		 System.out.println(user.isEnabled());
 
-	        if (user == null) {
-	            throw new UsernameNotFoundException("User " + username + " was not found in the database");
-	        }
 	    
+	        if(user!=null&&user.isEnabled()==true) {
 	        List<String> roles = userDao.getUserRoles(username);
 	        
 	        List<GrantedAuthority> grantList= new ArrayList<GrantedAuthority>();
@@ -47,8 +46,12 @@ public class AuthenticationService implements UserDetailsService{
 	        
 	        UserDetails userDetails = (UserDetails) new User(user.getUsername(), //
 	                user.getPassword(),grantList);
-
 	        return userDetails;
+	        }else {
+	        	
+	        	throw new UsernameNotFoundException("User " + username + " was not found in the database");
+	        	
+	        }
+	        
 	}
-
 }

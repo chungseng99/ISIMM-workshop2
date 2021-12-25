@@ -71,6 +71,8 @@ public class RegisterController {
 			model.setViewName("resetPasswordForm");
 
 		} else {
+			
+			String email=registerDao.userEmail(username);
 
 			// generate password, encode it and save it to database
 			PasswordGenerator generate = new PasswordGenerator();
@@ -81,13 +83,13 @@ public class RegisterController {
 
 			// Send new password to user email
 			SimpleMailMessage mailMessage = new SimpleMailMessage();
-			mailMessage.setTo(checkUsername);
+			mailMessage.setTo(email);
 			mailMessage.setSubject("Reset Password");
 			mailMessage.setText("You have requested to reset password.\n" + "Below is your new password \n"
 					+ "Password:" + generatedPassword);
 			mailSender.send(mailMessage);
 
-			model.addObject("email", checkUsername);
+			model.addObject("email", email);
 			model.setViewName("resetComplete");
 
 		}
