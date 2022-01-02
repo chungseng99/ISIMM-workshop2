@@ -21,11 +21,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ftmk.model.Announcement;
-import com.ftmk.model.Attendance;
+import com.ftmk.model.StudentAttendance;
 import com.ftmk.model.Classroom;
 import com.ftmk.model.Fee;
 import com.ftmk.model.Payment;
-import com.ftmk.model.ReportCard;
+import com.ftmk.model.StudentReportCard;
 import com.ftmk.model.Subject;
 import com.ftmk.model.UserPersonalDetails;
 import com.ftmk.model.UserTableDisplay;
@@ -89,7 +89,13 @@ public class clerkDashboardDao {
 
 		String sql = "SELECT classroom.class_name FROM classroom JOIN class_participant ON "
 				+ "classroom.classroom_id=class_participant.classroom_id WHERE class_participant.user_id="+userId;
-		return jdbcTemplate.queryForObject(sql, String.class);
+		
+		return jdbcTemplate.query(sql, new ResultSetExtractor<String>() {
+			@Override
+			public String extractData(ResultSet rs) throws SQLException, DataAccessException {
+				return rs.next() ? rs.getString("class_name") : null;
+			}
+		});
 	}
 
 	public int createClassroom(Classroom classroom) {
@@ -1204,25 +1210,25 @@ public class clerkDashboardDao {
 		
 	}
 	
-	public List<Attendance> AttendanceById(Integer userId) {
+	public List<StudentAttendance> AttendanceById(Integer userId) {
 		// Select certain field from each table to be displayed in admin dashboard
 		String sql = "SELECT attendance_record.*,attendance.*,user_details.name FROM attendance_record "
 				+ "JOIN attendance ON attendance_record.attendance_id=attendance.attendance_id "
 				+ "JOIN user_details ON user_details.user_id=attendance_record.user_id WHERE attendance_record.user_id="+userId;
-		List<Attendance> list = jdbcTemplate.query(sql, new RowMapper<Attendance>() {
+		List<StudentAttendance> list = jdbcTemplate.query(sql, new RowMapper<StudentAttendance>() {
 
 			@Override
-			public Attendance mapRow(ResultSet rs, int rowNum) throws SQLException {
-
-				Attendance attendance = new Attendance();
-				attendance.setAttendanceId(rs.getInt("attendance_id"));
-				attendance.setAttendanceName(rs.getString("attendance_name"));
-				attendance.setAttendanceDate(rs.getDate("attendance_time"));
-				attendance.setName(rs.getString("name"));
-				attendance.setStatus(rs.getString("status"));
-				attendance.setUserId(rs.getInt("user_id"));
-				return attendance;
-			}
+			public StudentAttendance mapRow(ResultSet rs, int rowNum) throws SQLException {
+							
+					StudentAttendance attendance = new StudentAttendance();
+					attendance.setAttendanceId(rs.getInt("attendance_id"));
+					attendance.setAttendanceName(rs.getString("attendance_name"));
+					attendance.setAttendanceDate(rs.getDate("attendance_time"));
+					attendance.setName(rs.getString("name"));
+					attendance.setStatus(rs.getString("status"));
+					attendance.setUserId(rs.getInt("user_id"));
+					return attendance;
+				}
 		});
 		return list;
 	}
@@ -1230,32 +1236,43 @@ public class clerkDashboardDao {
 	public Double getPresentCount(Integer userId) {
 		// Search username in database
 
-		String sql = "SELECT COUNT(status) FROM attendance_record JOIN attendance ON "
+		String sql = "SELECT COUNT(status) as count  FROM attendance_record JOIN attendance ON "
 				+ "attendance_record.attendance_id=attendance.attendance_id WHERE "
 				+ "status='present'AND YEAR(attendance.attendance_time)=YEAR(curdate()) AND attendance_record.user_id="+userId;
-		return jdbcTemplate.queryForObject(sql, Double.class);
+		return jdbcTemplate.query(sql, new ResultSetExtractor<Double>() {
+			@Override
+			public Double extractData(ResultSet rs) throws SQLException, DataAccessException {
+				return rs.next() ? rs.getDouble("count") : null;
+			}
+		});
 	}
 	
 	public Double getTotalAttendanceCount(Integer userId) {
 		// Search username in database
 
-		String sql = "SELECT COUNT(status) FROM attendance_record JOIN attendance ON "
+		String sql = "SELECT COUNT(status) as count FROM attendance_record JOIN attendance ON "
 				+ "attendance_record.attendance_id=attendance.attendance_id WHERE "
 				+ "YEAR(attendance.attendance_time)=YEAR(curdate()) AND attendance_record.user_id="+userId;
-		return jdbcTemplate.queryForObject(sql, Double.class);
+		
+		return jdbcTemplate.query(sql, new ResultSetExtractor<Double>() {
+			@Override
+			public Double extractData(ResultSet rs) throws SQLException, DataAccessException {
+				return rs.next() ? rs.getDouble("count") : null;
+			}
+		});
 	}
 	
-	public List<ReportCard> reportCardById(Integer userId) {
+	public List<StudentReportCard> reportCardById(Integer userId) {
 		// Select certain field from each table to be displayed in admin dashboard
 		String sql = "SELECT report_card.*,subject.subject_name,result.grade FROM report_card JOIN result ON "
 				+ "report_card.result_id=result.result_id JOIN subject ON "
 				+ "result.subject_id=subject.subject_id WHERE report_card.user_id="+userId;
-		List<ReportCard> list = jdbcTemplate.query(sql, new RowMapper<ReportCard>() {
+		List<StudentReportCard> list = jdbcTemplate.query(sql, new RowMapper<StudentReportCard>() {
 
 			@Override
-			public ReportCard mapRow(ResultSet rs, int rowNum) throws SQLException {
+			public StudentReportCard mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-				ReportCard report = new ReportCard();
+				StudentReportCard report = new StudentReportCard();
 				report.setReportCardId(rs.getInt("report_card_id"));
 				report.setUserId(rs.getInt("user_id"));
 				report.setAttendanceReport(rs.getDouble("attendance_report"));

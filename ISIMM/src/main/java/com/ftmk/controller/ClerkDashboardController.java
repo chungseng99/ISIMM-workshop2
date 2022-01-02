@@ -34,12 +34,12 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.ftmk.dao.clerkDashboardDao;
 import com.ftmk.model.Announcement;
-import com.ftmk.model.Attendance;
+import com.ftmk.model.StudentAttendance;
 import com.ftmk.model.ClassParticipant;
 import com.ftmk.model.Classroom;
 import com.ftmk.model.Fee;
 import com.ftmk.model.Payment;
-import com.ftmk.model.ReportCard;
+import com.ftmk.model.StudentReportCard;
 import com.ftmk.model.Subject;
 import com.ftmk.model.UserPersonalDetails;
 import com.ftmk.model.UserTableDisplay;
@@ -530,9 +530,9 @@ public class ClerkDashboardController {
 				MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 				helper.setTo(InternetAddress.parse(combinedEmail));
 				helper.setSubject(announcement.getTitle());
-				helper.setText("Integrated School Information Management and Monitoring System\n"+ 
-				"________________________________________________________________________________\n\n"
-				+announcement.getDescription());
+				helper.setText("Integrated School Information Management and Monitoring System\n"
+						+ "________________________________________________________________________________\n\n"
+						+ announcement.getDescription());
 
 			}
 		};
@@ -1203,9 +1203,9 @@ public class ClerkDashboardController {
 		SimpleMailMessage mailMessage = new SimpleMailMessage();
 		mailMessage.setTo(email);
 		mailMessage.setSubject("Payment Approved!");
-		mailMessage.setText("Integrated School Information Management and Monitoring System\n"+ 
-				"________________________________________________________________________________\n\n"+
-				"Thank you for your payment. \n" + "Please click the link below to view your receipt \n"
+		mailMessage.setText("Integrated School Information Management and Monitoring System\n"
+				+ "________________________________________________________________________________\n\n"
+				+ "Thank you for your payment. \n" + "Please click the link below to view your receipt \n"
 				+ "http://localhost:8080/ISIMM/viewReceipt/AVkM" + paymentId + "WvAtcZ0LTjm29WFN");
 		mailSender.send(mailMessage);
 
@@ -1226,10 +1226,10 @@ public class ClerkDashboardController {
 		SimpleMailMessage mailMessage = new SimpleMailMessage();
 		mailMessage.setTo(email);
 		mailMessage.setSubject("Payment Rejected!");
-		mailMessage.setText("Integrated School Information Management and Monitoring System\n"+ 
-				"________________________________________________________________________________\n\n"+
-				"Sorry your payment has been rejected. \n" + "This might due to: \n" + "1. Unclear payment proof. \n"
-						+ "2. Missing payment proof. \n\n" + "Please upload a new payment proof. ");
+		mailMessage.setText("Integrated School Information Management and Monitoring System\n"
+				+ "________________________________________________________________________________\n\n"
+				+ "Sorry your payment has been rejected. \n" + "This might due to: \n" + "1. Unclear payment proof. \n"
+				+ "2. Missing payment proof. \n\n" + "Please upload a new payment proof. ");
 		mailSender.send(mailMessage);
 
 		model.setViewName("redirect:/paymentPage");
@@ -1396,7 +1396,7 @@ public class ClerkDashboardController {
 		return model;
 
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = { "/teacherPage", "/teacherPage/{page}" })
 	public ModelAndView teacherPage(ModelAndView model, @PathVariable(required = false, name = "page") String page,
@@ -1443,7 +1443,6 @@ public class ClerkDashboardController {
 		return model;
 
 	}
-
 
 	@RequestMapping(value = "/searchTeacher", method = RequestMethod.GET)
 	public String searchTeacher() {
@@ -1595,7 +1594,7 @@ public class ClerkDashboardController {
 		return model;
 
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = { "/subjectPage", "/subjectPage/{page}" })
 	public ModelAndView subjectPage(ModelAndView model, @PathVariable(required = false, name = "page") String page,
@@ -1632,7 +1631,7 @@ public class ClerkDashboardController {
 		return model;
 
 	}
-	
+
 	@RequestMapping(value = "/deleteSubject", method = RequestMethod.GET)
 	public ModelAndView deleteSubject(@RequestParam Integer subjectId) {
 
@@ -1641,128 +1640,139 @@ public class ClerkDashboardController {
 		return new ModelAndView("redirect:/subjectPage");
 
 	}
-	
-	
-	@RequestMapping(value={"/subjectPage/addSubject","/addSubject"},method = RequestMethod.POST)
-	public ModelAndView addSubject(ModelAndView model,Subject subject) {
-		
+
+	@RequestMapping(value = { "/subjectPage/addSubject", "/addSubject" }, method = RequestMethod.POST)
+	public ModelAndView addSubject(ModelAndView model, Subject subject) {
+
 		clerkDao.AddSubject(subject);
 		model.setViewName("redirect:/subjectPage");
 		return model;
-		
+
 	}
-	
-	@RequestMapping(value="/profile",method=RequestMethod.GET)
-	public ModelAndView profile(ModelAndView model,Principal principal) {
-		
+
+	@RequestMapping(value = "/profile", method = RequestMethod.GET)
+	public ModelAndView profile(ModelAndView model, Principal principal) {
+
 		UserPersonalDetails user = clerkDao.getUserByUsername(principal.getName());
-		model.addObject("user",user);
-		model.setViewName("profile");	
+		model.addObject("user", user);
+		model.setViewName("profile");
 		return model;
 	}
-	
-	@RequestMapping(value="/updateProfile",method= RequestMethod.POST)
-	public ModelAndView updateProfile(ModelAndView model, @ModelAttribute(name="user")UserPersonalDetails user,
-			Principal principal,MultipartFile photo) {
-		
-		int userId=clerkDao.getUserIdByUsername(principal.getName());
+
+	@RequestMapping(value = "/updateProfile", method = RequestMethod.POST)
+	public ModelAndView updateProfile(ModelAndView model, @ModelAttribute(name = "user") UserPersonalDetails user,
+			Principal principal, MultipartFile photo) {
+
+		int userId = clerkDao.getUserIdByUsername(principal.getName());
 		try {
-			
+
 			clerkDao.updateProfile(user, userId, photo);
 			model.setViewName("redirect:/profile");
 			return model;
-			
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return model;
 		}
-		
-	}
-	
-	@RequestMapping(value="/viewAttendance",method=RequestMethod.GET)
-	public ModelAndView viewAttendance(@RequestParam(name="userId")int userId) {
-		
-		UserPersonalDetails user= clerkDao.getStudentById(userId);
-		String className= clerkDao.getClassNameByUserId(userId);
-		List<Attendance> attendance = clerkDao.AttendanceById(userId);
-		double totalAttendance=clerkDao.getTotalAttendanceCount(userId);
-		double presentCount=clerkDao.getPresentCount(userId);
-		int absentCount= (int) (totalAttendance-presentCount);
-		double attendancePercentage=(presentCount/totalAttendance)*100;
-		
-		ModelAndView model = new ModelAndView("viewAttendance");
-		model.addObject("attendance",attendance);
-		model.addObject("user",user);
-		model.addObject("className",className);
-		model.addObject("absent",absentCount);
-		model.addObject("percentage",attendancePercentage);
-		model.addObject("userId",userId);
-		return model;
-		
-	}
-	
-	@RequestMapping(value = "/printAttendance", method=RequestMethod.GET )
-	public ModelAndView printAttendance(@RequestParam(name="userId")int userId) {
 
-		UserPersonalDetails user= clerkDao.getStudentById(userId);
-		String className= clerkDao.getClassNameByUserId(userId);
-		List<Attendance> attendance = clerkDao.AttendanceById(userId);
-		Double totalAttendance=clerkDao.getTotalAttendanceCount(userId);
-		Double presentCount=clerkDao.getPresentCount(userId);
-		int absentCount= (int) (totalAttendance-presentCount);
-		double attendancePercentage=(presentCount/totalAttendance)*100;
-		
+	}
+
+	@RequestMapping(value = "/viewAttendance", method = RequestMethod.GET)
+	public ModelAndView viewAttendance(@RequestParam(name = "userId") int userId, ModelAndView model) {
+
+		UserPersonalDetails user = clerkDao.getStudentById(userId);
+		String className = clerkDao.getClassNameByUserId(userId);
+		List<StudentAttendance> attendance = clerkDao.AttendanceById(userId);
+		double totalAttendance = clerkDao.getTotalAttendanceCount(userId);
+		double presentCount = clerkDao.getPresentCount(userId);
+
+		if (className == null || attendance == null) {
+
+			model.setViewName("noRecordFound");
+
+		} else {
+
+			int absentCount = (int) (totalAttendance - presentCount);
+			double attendancePercentage = (presentCount / totalAttendance) * 100;
+			model.setViewName("viewAttendance");
+			model.addObject("attendance", attendance);
+			model.addObject("user", user);
+			model.addObject("className", className);
+			model.addObject("absent", absentCount);
+			model.addObject("percentage", attendancePercentage);
+			model.addObject("userId", userId);
+
+		}
+
+		return model;
+	}
+
+	@RequestMapping(value = "/printAttendance", method = RequestMethod.GET)
+	public ModelAndView printAttendance(@RequestParam(name = "userId") int userId) {
+
+		UserPersonalDetails user = clerkDao.getStudentById(userId);
+		String className = clerkDao.getClassNameByUserId(userId);
+		List<StudentAttendance> attendance = clerkDao.AttendanceById(userId);
+		Double totalAttendance = clerkDao.getTotalAttendanceCount(userId);
+		Double presentCount = clerkDao.getPresentCount(userId);
+		int absentCount = (int) (totalAttendance - presentCount);
+		double attendancePercentage = (presentCount / totalAttendance) * 100;
+
 		ModelAndView model = new ModelAndView("printAttendance");
-		model.addObject("attendance",attendance);
-		model.addObject("user",user);
-		model.addObject("className",className);
-		model.addObject("absent",absentCount);
-		model.addObject("percentage",attendancePercentage);
+		model.addObject("attendance", attendance);
+		model.addObject("user", user);
+		model.addObject("className", className);
+		model.addObject("absent", absentCount);
+		model.addObject("percentage", attendancePercentage);
 		return model;
-		
+
 	}
-	
-	@RequestMapping(value="/viewReportCard",method=RequestMethod.GET)
-	public ModelAndView viewReportCard(@RequestParam(name="userId")int userId) {
-		
-		UserPersonalDetails user= clerkDao.getStudentById(userId);
-		String className= clerkDao.getClassNameByUserId(userId);
-		List<ReportCard> report = clerkDao.reportCardById(userId);
-		String comment=clerkDao.teacherComment(userId);
-		Double attendance=clerkDao.attendancePercentage(userId);
-		
-		ModelAndView model = new ModelAndView("viewReportCard");
-		model.addObject("user",user);
-		model.addObject("className",className);
-		model.addObject("userId",userId);
-		model.addObject("report",report);
-		model.addObject("comment",comment);
-		model.addObject("attendance",attendance);
+
+	@RequestMapping(value = "/viewReportCard", method = RequestMethod.GET)
+	public ModelAndView viewReportCard(@RequestParam(name = "userId") int userId, ModelAndView model) {
+
+		UserPersonalDetails user = clerkDao.getStudentById(userId);
+		String className = clerkDao.getClassNameByUserId(userId);
+		List<StudentReportCard> report = clerkDao.reportCardById(userId);
+		String comment = clerkDao.teacherComment(userId);
+		Double attendance = clerkDao.attendancePercentage(userId);
+
+		if (className == null || attendance == null) {
+
+			model.setViewName("noRecordFound");
+			
+		} else {
+			model.setViewName("viewReportCard");
+			model.addObject("user", user);
+			model.addObject("className", className);
+			model.addObject("userId", userId);
+			model.addObject("report", report);
+			model.addObject("comment", comment);
+			model.addObject("attendance", attendance);
+		}
 		return model;
-		
+
 	}
-	
-	@RequestMapping(value="/printReportCard",method=RequestMethod.GET)
-	public ModelAndView printReportCard(@RequestParam(name="userId")int userId) {
-		
-		UserPersonalDetails user= clerkDao.getStudentById(userId);
-		String className= clerkDao.getClassNameByUserId(userId);
-		List<ReportCard> report = clerkDao.reportCardById(userId);
-		String comment=clerkDao.teacherComment(userId);
-		Double attendance=clerkDao.attendancePercentage(userId);
-		
+
+	@RequestMapping(value = "/printReportCard", method = RequestMethod.GET)
+	public ModelAndView printReportCard(@RequestParam(name = "userId") int userId) {
+
+		UserPersonalDetails user = clerkDao.getStudentById(userId);
+		String className = clerkDao.getClassNameByUserId(userId);
+		List<StudentReportCard> report = clerkDao.reportCardById(userId);
+		String comment = clerkDao.teacherComment(userId);
+		Double attendance = clerkDao.attendancePercentage(userId);
+
 		ModelAndView model = new ModelAndView("printReportCard");
-		model.addObject("user",user);
-		model.addObject("className",className);
-		model.addObject("userId",userId);
-		model.addObject("report",report);
-		model.addObject("comment",comment);
-		model.addObject("attendance",attendance);
+		model.addObject("user", user);
+		model.addObject("className", className);
+		model.addObject("userId", userId);
+		model.addObject("report", report);
+		model.addObject("comment", comment);
+		model.addObject("attendance", attendance);
 		return model;
-		
+
 	}
-	
-	
 
 }

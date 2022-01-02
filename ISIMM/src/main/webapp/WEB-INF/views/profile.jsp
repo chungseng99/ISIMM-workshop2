@@ -166,7 +166,7 @@
 								method="post" novalidate="novalidate">
 								<form:hidden path="userId"/>
 								<div align="center">
-								<div class="card mt-3" style="width:200px">
+								<div class="card mt-3" style="width:200px;height:300px">
 								<img class="card-img-top" src="getStudentPhoto/<c:out value='${user.userId}'/>">
 								
 								</div>

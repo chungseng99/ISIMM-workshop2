@@ -1,6 +1,6 @@
 package com.ftmk.model;
 
-public class ReportCard {
+public class StudentReportCard {
 
 	
 	private Integer reportCardId;

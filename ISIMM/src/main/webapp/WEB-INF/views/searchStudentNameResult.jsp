@@ -183,6 +183,12 @@
 								<td><a class="mr-3"
 									href="${pageContext.request.contextPath}/viewStudent?userId=${student.userId }"><input
 										type="button" class="btn btn-primary" value="View"></a>
+										<div class="mt-3">
+										<a href="${pageContext.request.contextPath}/viewAttendance?userId=${student.userId}"><input
+										type="button" class="btn btn-primary" value="View Attendance"></a></div>
+										<div class="mt-3">	
+										<a href="${pageContext.request.contextPath}/viewReportCard?userId=${student.userId}"><input
+										type="button" class="btn btn-primary" value="View Report Card"></a></div>
 							</tr>
 						</c:forEach>
 					</table>

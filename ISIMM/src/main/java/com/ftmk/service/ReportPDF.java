@@ -6,7 +6,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.ftmk.model.ReportCard;
+import com.ftmk.model.StudentReportCard;
 import com.ftmk.model.UserPersonalDetails;
 import com.itextpdf.kernel.colors.Color;
 import com.itextpdf.kernel.colors.DeviceRgb;
@@ -27,7 +27,7 @@ public class ReportPDF extends AbstractViewPDF{
 
 		UserPersonalDetails user= (UserPersonalDetails) model.get("user");
 		String className= (String) model.get("className");
-		List<ReportCard> report = (List<ReportCard>) model.get("report");
+		List<StudentReportCard> report = (List<StudentReportCard>) model.get("report");
 		String comment= (String) model.get("comment");
 		Double attendance= (Double) model.get("attendance");
 		
@@ -50,7 +50,7 @@ public class ReportPDF extends AbstractViewPDF{
 		table.addHeaderCell(new Cell().add(new Paragraph("Marks")).setBold().setBackgroundColor(bgColour));
 		
 		int i=0;
-		for(ReportCard reports:report) {
+		for(StudentReportCard reports:report) {
 			
 			int count=i+1;
 			String index= String.valueOf(count);

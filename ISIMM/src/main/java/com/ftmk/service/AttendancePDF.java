@@ -6,7 +6,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.ftmk.model.Attendance;
+import com.ftmk.model.StudentAttendance;
 import com.ftmk.model.UserPersonalDetails;
 import com.itextpdf.kernel.colors.Color;
 import com.itextpdf.kernel.colors.DeviceRgb;
@@ -25,7 +25,7 @@ public class AttendancePDF extends AbstractViewPDF {
 	protected void buildPdfDocument(Map<String, Object> model, Document document, PdfWriter writer,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		List<Attendance> attendance = (List<Attendance>) model.get("attendance");
+		List<StudentAttendance> attendance = (List<StudentAttendance>) model.get("attendance");
 		String className= (String) model.get("className");
 		UserPersonalDetails user = (UserPersonalDetails) model.get("user");
 		int absentCount= (int) model.get("absent");
@@ -51,7 +51,7 @@ public class AttendancePDF extends AbstractViewPDF {
 		table.addHeaderCell(new Cell().add(new Paragraph("Status")).setBold().setBackgroundColor(bgColour));
 		
 		int i=0;
-		for(Attendance attendances:attendance) {
+		for(StudentAttendance attendances:attendance) {
 			
 			int count=i+1;
 			String index= String.valueOf(count);

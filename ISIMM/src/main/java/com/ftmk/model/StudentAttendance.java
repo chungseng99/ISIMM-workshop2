@@ -2,7 +2,7 @@ package com.ftmk.model;
 
 import java.util.Date;
 
-public class Attendance {
+public class StudentAttendance {
 	
 	private Integer attendanceId;
 	private String attendanceName;
